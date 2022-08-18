@@ -82,7 +82,7 @@ analytics:
 author:
   name             : "Valerie Fong"
   avatar           : "profile.png"
-  bio              : "PhD student in Applied Mathematics"
+  bio              : "PhD student in\n Applied Mathematics"
   location         : "Davis, CA"
   employer         : 
   pubmed           :  # "https://www.ncbi.nlm.nih.gov/pubmed/?term=john+snow"

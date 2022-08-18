@@ -14,7 +14,7 @@ Education
 * B.S. in Statistics, University of New Mexico - May 2022
   * Awarded National Hispanic Scholarship
   * Ronald McNair Scholar
-* Ph.D in Applied Mathematics, GitHub University, 2027 (expected)
+* Ph.D in Applied Mathematics, University of California, Davis - Entering Fall 2022
   * National Science Foundation Graduate Research Fellow (NSF GRF)
   * National GEM Consortium Fellow
 
