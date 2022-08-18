@@ -84,7 +84,7 @@ author:
   avatar           : "profile.png"
   bio              : "PhD student in Applied Mathematics"
   location         : "Davis, CA"
-  employer         :
+  employer         : 
   pubmed           :  # "https://www.ncbi.nlm.nih.gov/pubmed/?term=john+snow"
   googlescholar    :  # "http://yourfullgooglescholarurl.com"
   email            : "valfong@ucdavis.edu"
@@ -96,7 +96,7 @@ author:
   flickr           :
   facebook         : "facebook.com/valhurricane"
   foursquare       :
-  github           : "valeriefong.github.io"
+  github           : "valeriefong"
   google_plus      :
   keybase          :
   instagram        : "instagram.com/valhurricane"
