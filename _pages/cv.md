@@ -11,21 +11,20 @@ redirect_from:
 
 Education
 ======
-* B.S. in GitHub, GitHub University, 2012
-* M.S. in Jekyll, GitHub University, 2014
-* Ph.D in Version Control Theory, GitHub University, 2018 (expected)
+* B.S. in Statistics, University of New Mexico - May 2022
+  * Awarded National Hispanic Scholarship
+  * Ronald McNair Scholar
+* Ph.D in Applied Mathematics, GitHub University, 2027 (expected)
+  * National Science Foundation Graduate Research Fellow (NSF GRF)
+  * National GEM Consortium Fellow
 
 Work experience
 ======
-* Summer 2015: Research Assistant
-  * Github University
-  * Duties included: Tagging issues
-  * Supervisor: Professor Git
+* iRhythm Technologies, Summer 2022
 
-* Fall 2015: Research Assistant
-  * Github University
-  * Duties included: Merging pull requests
-  * Supervisor: Professor Hub
+
+* Sandia National Laboratories, February 2019 - May 2021
+
   
 Skills
 ======
@@ -56,4 +55,4 @@ Teaching
   
 Service and leadership
 ======
-* Currently signed in to 43 different slack teams
+* 
