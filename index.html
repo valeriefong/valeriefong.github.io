@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Valerie Fong</title>
+<meta name="description" content="Valerie Fong, applied mathematician and PhD candidate at UC Davis, studying recurrent networks with many oscillatory modes at the edge of stability.">
+<meta property="og:title" content="Valerie Fong">
+<meta property="og:description" content="Applied mathematician studying how networks at the edge of stability generate long sequences of activity.">
+<meta property="og:url" content="https://valeriefong.github.io/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='11' fill='none' stroke='%232a47a0' stroke-width='3'/%3E%3Cpath d='M24 4v24' stroke='%23b0306a' stroke-width='3'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+
+<nav class="topnav wide" aria-label="Main">
+  <a class="home" href="index.html">Valerie Fong</a>
+  <ul>
+    <li><a href="index.html" aria-current="page">About</a></li>
+    <li><a href="research.html">Research</a></li>
+    <li><a href="cv.html">CV</a></li>
+  </ul>
+</nav>
+
+<header class="intro wrap">
+  <h1>Valerie Fong</h1>
+  <p class="lead">I’m an applied mathematician finishing a PhD at UC Davis. I study recurrent networks with many oscillatory modes held at the edge of stability, and how their activity can generate long, non-repeating sequences that other neurons read out as time.</p>
+  <p>Before graduate school I worked on demand forecasting at iRhythm Technologies and on data and reporting tools at Sandia National Laboratories. I’m looking for summer 2027 internships in quantitative risk and data science.</p>
+  <div class="contact">
+    <a href="files/Valerie_Fong_Resume.pdf">Resume (PDF)</a>
+    <a href="mailto:valfong@ucdavis.edu">valfong@ucdavis.edu</a>
+    <a href="https://github.com/valeriefong">GitHub</a>
+  </div>
+</header>
+
+<main>
+<section class="block wide" aria-labelledby="ideas-h">
+  <h2 id="ideas-h">Three ideas behind my work</h2>
+
+  <div class="preview">
+    <div class="text">
+      <h3>Modes near the edge of stability</h3>
+      <p>A linear network’s activity is a sum of modes, each an oscillation that grows or decays at a rate set by its eigenvalue. A mode whose eigenvalue sits just left of the imaginary axis fades very slowly, so it can carry information for a long time.</p>
+      <p class="more"><a href="research.html#sequences">How I use many of them at once</a></p>
+    </div>
+    <figure class="stage stage-mode" style="margin:0">
+      <div class="panel"><canvas id="mode-canvas" role="img" aria-label="A single oscillating mode shown as a spiral in the complex plane and as activity over time."></canvas></div>
+      <div class="controls">
+        <label for="mode-alpha">Real part α = <output id="mode-aout" for="mode-alpha">−0.15</output></label>
+        <input id="mode-alpha" type="range" min="-0.5" max="0.04" step="0.005" value="-0.15">
+      </div>
+      <p class="readout" id="mode-readout" aria-live="polite"></p>
+    </figure>
+  </div>
+
+  <div class="preview">
+    <div class="text">
+      <h3>Quasiperiodicity</h3>
+      <p>Two oscillations together move a point around a torus. If their frequencies have a rational ratio, the path closes and repeats. If the ratio is irrational, it never does. A network with many such frequencies traces a path that takes an extremely long time to come back.</p>
+      <p class="more"><a href="research.html#sequences">Measuring how long it takes to return</a></p>
+    </div>
+    <figure class="stage stage-torus" style="margin:0">
+      <div class="panel"><canvas id="torus-canvas" role="img" aria-label="A path winding around a torus."></canvas></div>
+      <div class="controls">
+        <div class="seg" role="group" aria-label="Frequency ratio">
+          <button id="torus-golden" type="button" aria-pressed="true">Irrational ratio</button>
+          <button id="torus-rational" type="button" aria-pressed="false">Rational ratio</button>
+        </div>
+      </div>
+      <p class="readout" id="torus-readout" aria-live="polite"></p>
+    </figure>
+  </div>
+
+  <div class="preview" id="edge">
+    <div class="text">
+      <h3>The transition to chaos</h3>
+      <p>In the classic random network of Sompolinsky, Crisanti and Sommers (1988), raising the gain <i class="m">g</i> pushes the connectivity’s eigenvalues past a boundary, and quiet activity gives way to self-sustained, chaotic activity. Only a few eigenvalues cross at first. My work asks what happens when many cross together.</p>
+      <p class="more"><a href="research.html#lyapunov">Measuring chaos with Lyapunov exponents</a></p>
+    </div>
+    <figure class="stage" style="margin:0">
+      <div class="gain-panels">
+        <div class="panel spec"><canvas id="spec" role="img" aria-label="Eigenvalues of the scaled connectivity matrix with the stability boundary at real part one."></canvas></div>
+        <div class="panel trace"><canvas id="trace" role="img" aria-label="Activity of six units over time."></canvas></div>
+      </div>
+      <div class="controls">
+        <label for="gain">Gain <i class="m">g</i> = <output id="gout" for="gain">1.00</output></label>
+        <input id="gain" type="range" min="0.5" max="1.6" step="0.01" value="1.00">
+        <button id="kick" type="button">Perturb the network</button>
+      </div>
+      <p class="readout" id="readout" aria-live="polite"></p>
+      <figcaption>A network of 160 units, <i class="m">dx/dt</i> = −<i class="m">x</i> + <i class="m">gW</i> tanh(<i class="m">x</i>), with Gaussian weights of variance 1/<i class="m">N</i>. Left: eigenvalues of <i class="m">gW</i>. Right: rates tanh(<i class="m">x</i>) of six units.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="block wrap" aria-labelledby="kit-h">
+  <h2 id="kit-h">Toolkit</h2>
+  <dl class="kit">
+    <dt>Dynamics and modeling</dt>
+    <dd>Numerical ODE integration, eigenspectral analysis, Lyapunov spectra by QR reorthonormalization, dynamic mode decomposition, large-scale simulation</dd>
+    <dt>Statistics and machine learning</dt>
+    <dd>Time series forecasting (ARIMA, empirical mode decomposition, seasonal-trend decomposition), global sensitivity analysis (Sobol’ indices), PCA, k-means, convolutional networks</dd>
+    <dt>Software</dt>
+    <dd>Python (NumPy, SciPy, Matplotlib), R, MATLAB, Git, LaTeX, high-performance computing</dd>
+  </dl>
+</section>
+</main>
+
+<footer class="wrap">
+  <p>Valerie Fong, Davis, California</p>
+  <p><a href="mailto:valfong@ucdavis.edu">valfong@ucdavis.edu</a></p>
+  <p><a href="https://github.com/valeriefong">github.com/valeriefong</a></p>
+</footer>
+
+<script src="assets/js/viz.js"></script>
+</body>
+</html>

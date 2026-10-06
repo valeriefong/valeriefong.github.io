@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Research · Valerie Fong</title>
+<meta name="description" content="Research by Valerie Fong on dynamically critical recurrent networks: sequence generation, self-tuning, and Lyapunov spectra.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='11' fill='none' stroke='%232a47a0' stroke-width='3'/%3E%3Cpath d='M24 4v24' stroke='%23b0306a' stroke-width='3'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+
+<nav class="topnav wide" aria-label="Main">
+  <a class="home" href="index.html">Valerie Fong</a>
+  <ul>
+    <li><a href="index.html">About</a></li>
+    <li><a href="research.html" aria-current="page">Research</a></li>
+    <li><a href="cv.html">CV</a></li>
+  </ul>
+</nav>
+
+<header class="intro wrap">
+  <h1>Research</h1>
+  <p class="lead">My PhD research with Rishidev Chaudhuri at UC Davis studies recurrent networks in which many oscillatory modes sit at the edge of stability at once. Their activity winds through a high-dimensional space for a long time without repeating, which may give the brain a rich substrate for timing and sequence generation.</p>
+</header>
+
+<main>
+
+<!-- ============ Sequence generation ============ -->
+<section class="project" id="sequences" aria-labelledby="seq-h">
+  <div class="wrap">
+    <h2 id="seq-h">Sequence generation in dynamically critical networks</h2>
+    <p>In a linear network <i class="m">dx/dt</i> = <i class="m">Ax</i>, I construct the connectivity so that many complex-conjugate eigenvalue pairs sit just left of the imaginary axis. Each pair contributes a slowly decaying oscillation. With incommensurate frequencies, their sum is quasiperiodic: it never exactly repeats.</p>
+    <p>To measure how long the activity takes to come back, I track the cosine similarity between the current state and the starting state. The recurrence time is the first moment it climbs back above a threshold. A downstream neuron with a rectified linear response can then fire at one particular moment, when the state lines up with its weights.</p>
+  </div>
+
+  <figure class="interactive wide">
+    <div class="seq-panels">
+      <div class="panel traj"><canvas id="seq-traj" role="img" aria-label="The network's activity projected onto two dimensions, colored by time."></canvas></div>
+      <div class="panel plot"><canvas id="seq-plot" role="img" aria-label="Similarity of the state to its starting direction over time, and four readout neurons that fire when the state matches their target."></canvas></div>
+    </div>
+    <div class="controls">
+      <label for="seq-k">Oscillatory modes <i class="m">K</i> = <output id="seq-kout" for="seq-k">3</output></label>
+      <input id="seq-k" type="range" min="2" max="24" step="1" value="3">
+      <button id="seq-new" type="button">New network</button>
+    </div>
+    <p class="readout" id="seq-readout" aria-live="polite"></p>
+    <figcaption><b>Figure 1.</b> Activity is a sum of <i class="m">K</i> oscillations with random frequencies and decay rates between 0.001 and 0.004 per time unit, so every mode is near critical. Right, top: cosine similarity between the state and its starting direction; the dashed line is the 0.9 threshold and the red mark is the first return. Right, bottom: four readout neurons, each tuned to the state at the moment marked by its triangle, responding in proportion to max(0, similarity − 0.9). Try a few modes, then many.</figcaption>
+  </figure>
+
+  <div class="wrap">
+    <p>The same picture in my simulations, with connectivity built so that its spectrum hugs the imaginary axis:</p>
+  </div>
+  <figure class="still wide">
+    <a href="assets/figures/dcn-spectrum.webp"><img src="assets/figures/dcn-spectrum.webp" width="2400" height="864" loading="lazy" alt="Three panels: eigenvalues of A clustered along the imaginary axis; activity traces of three units; the trajectory in three dimensions."></a>
+    <figcaption><b>Figure 2.</b> (A) Eigenvalues of <i class="m">A</i>, with many modes clustered at Re λ ≈ 0. (B) Activity of three units. (C) The same trajectory in three dimensions.</figcaption>
+  </figure>
+
+  <div class="wrap">
+    <p>In preliminary simulations, recurrence time grows rapidly with network size, because larger networks hold more near-critical modes.</p>
+  </div>
+  <figure class="still wide">
+    <a href="assets/figures/recurrence.webp"><img src="assets/figures/recurrence.webp" width="2400" height="968" loading="lazy" alt="Left: a trajectory returning near its starting direction. Right: recurrence time rising with network size on a log scale."></a>
+    <figcaption><b>Figure 3.</b> (A) Recurrence is the first time the trajectory’s direction (red) comes back within a small angle of its starting direction (black). (B) Recurrence time against network size <i class="m">N</i>, log scale. Each point summarizes 20 networks, each with its own connectivity and initial condition. Preliminary.</figcaption>
+  </figure>
+
+  <div class="wrap">
+    <p>I’m now testing how well banks of rectified linear readouts can decode these trajectories into sequences of timed pulses.</p>
+  </div>
+  <figure class="still wide">
+    <a href="assets/figures/readout.webp"><img src="assets/figures/readout.webp" width="2400" height="612" loading="lazy" alt="Left: a trajectory crossing a readout hyperplane, producing a single pulse. Right: a recurrent network driving four readouts that peak at different times."></a>
+    <figcaption><b>Figure 4.</b> Schematic. (A) A readout with weights α fires when the trajectory crosses its hyperplane at time <i class="m">t̂</i>. (B) The network drives several readouts, each peaking at its own time.</figcaption>
+  </figure>
+</section>
+
+<!-- ============ Self-tuning ============ -->
+<section class="project" id="self-tuning" aria-labelledby="st-h">
+  <div class="wrap">
+    <h2 id="st-h">Networks that tune themselves</h2>
+    <p>Criticality doesn’t have to be built by hand. Magnasco et al. (2009) showed that a local learning rule can drive a network’s eigenvalues to the stability boundary on its own. I reimplemented that model as a starting point for asking which computations this regime supports.</p>
+  </div>
+  <figure class="still wide">
+    <a href="assets/figures/self-tuning.webp"><img src="assets/figures/self-tuning.webp" width="2400" height="1078" loading="lazy" alt="Eigenvalues of W over time collapsing toward zero real part, with bounded oscillatory activity traces and a three-dimensional trajectory."></a>
+    <figcaption><b>Figure 5.</b> Eigenvalues of <i class="m">W</i> over time on a log scale: the real parts (black) collapse toward zero as the network tunes itself, while activity stays bounded and oscillatory.</figcaption>
+  </figure>
+</section>
+
+<!-- ============ Lyapunov ============ -->
+<section class="project" id="lyapunov" aria-labelledby="ly-h">
+  <div class="wrap">
+    <h2 id="ly-h">Lyapunov spectra across the transition to chaos</h2>
+    <p>Add a nonlinearity and turn up the gain, and a network eventually loses stability. In the classical random network only a few eigenvalues reach the boundary first. With dynamically critical connectivity, many modes should lose stability almost together, and I want to know what that transition produces.</p>
+    <p>Lyapunov exponents are the right measurement. They give the average exponential rate at which nearby trajectories converge or separate, one for each direction in state space. I compute the full spectrum by evolving a set of perturbation vectors with the network’s Jacobian and reorthonormalizing them with a QR decomposition, following Engelken et al. (2020). From the spectrum come the Kaplan–Yorke dimension of the attractor and its entropy rate.</p>
+  </div>
+
+  <figure class="interactive wide">
+    <div class="ly-panels">
+      <div class="panel"><canvas id="ly-spec" role="img" aria-label="The Lyapunov spectrum, estimated live, with positive exponents highlighted."></canvas></div>
+      <div class="panel"><canvas id="ly-conv" role="img" aria-label="Running estimate of the largest Lyapunov exponent as averaging time grows."></canvas></div>
+    </div>
+    <div class="controls">
+      <label for="ly-g">Gain <i class="m">g</i> = <output id="ly-gout" for="ly-g">2.50</output></label>
+      <input id="ly-g" type="range" min="0.5" max="3.5" step="0.05" value="2.50">
+      <button id="ly-restart" type="button">Restart the estimate</button>
+    </div>
+    <p class="readout" id="ly-readout" aria-live="polite"></p>
+    <figcaption><b>Figure 6.</b> Computed live in your browser for the classical random network with 80 units, <i class="m">dx/dt</i> = −<i class="m">x</i> + <i class="m">gW</i> tanh(<i class="m">x</i>). The state and 80 perturbation vectors advance by Euler steps of 0.05, reorthonormalizing every 0.2 time units after a transient of 40. Left: all 80 exponents, per time constant. Right: the largest one settling as the average grows. Below <i class="m">g</i> = 1 every exponent is negative. In a network this small, activity just above the transition often settles onto a cycle, with the largest exponent near zero; clear chaos, with a positive exponent, appears at larger gain.</figcaption>
+  </figure>
+
+  <div class="wrap">
+    <p>The next step is the comparison this demo can’t show yet: the same computation with dynamically critical connectivity, asking whether more exponents sit near zero at the transition than in the classical network.</p>
+  </div>
+</section>
+
+<!-- ============ Data ============ -->
+<section class="project" id="data" aria-labelledby="data-h">
+  <div class="wrap">
+    <h2 id="data-h">Learning dynamics from recordings</h2>
+    <p>I’ve also applied dynamic mode decomposition, a data-driven method for learning linear dynamics from time series, to Neuropixels recordings from the Hanks Lab.</p>
+  </div>
+</section>
+
+</main>
+
+<footer class="wrap">
+  <p>Valerie Fong, Davis, California</p>
+  <p><a href="mailto:valfong@ucdavis.edu">valfong@ucdavis.edu</a></p>
+  <p><a href="https://github.com/valeriefong">github.com/valeriefong</a></p>
+</footer>
+
+<script src="assets/js/viz.js"></script>
+</body>
+</html>
