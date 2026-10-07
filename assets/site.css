@@ -142,6 +142,16 @@ ul.plain li{margin:0 0 .45rem}
 footer{border-top:1px solid var(--rule);padding-block:2rem 4rem;font-size:1rem;color:var(--muted);margin-top:2rem}
 footer p{margin:0 0 .4rem}
 
+/* ---------- footer easter egg ---------- */
+details.partner{margin-top:1.4rem}
+details.partner summary{display:inline-block;cursor:pointer;list-style:none;color:var(--muted);text-decoration:underline dotted;text-underline-offset:.2em;text-decoration-color:var(--rule)}
+details.partner summary::-webkit-details-marker{display:none}
+details.partner summary:hover{color:var(--ink)}
+details.partner[open] summary{color:var(--ink)}
+.partner-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.26fr) minmax(0,1fr);gap:.5rem;margin-top:.9rem;max-width:34rem}
+.partner-grid img{display:block;width:100%;max-width:100%;height:auto;object-fit:cover;border-radius:3px;border:1px solid var(--rule)}
+details.partner p{margin:.7rem 0 0;color:var(--ink)}
+
 @media (max-width:760px){
   body{font-size:1.0625rem}
   .lead{font-size:1.16rem}
