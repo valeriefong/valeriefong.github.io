@@ -333,73 +333,147 @@ function loop(el, frame){
 })();
 
 // ======================================================================
-// 5. Lyapunov spectrum, computed live by QR reorthonormalization
-//    dx/dt = -x + g W tanh(x);  tangent dynamics dQ/dt = J Q,  J = -I + g W diag(1 - tanh^2 x)
+// 5. Lyapunov spectra, random vs dynamically critical connectivity, computed live.
+//    Matrices come from rnn_lyapunov (assets/js/lyap-nets.js). Same scheme as the package:
+//    dx/dt = -x + g W tanh(x), classical RK4 for the state and the exact RK4 tangent map
+//    for the perturbation basis, QR (modified Gram-Schmidt) every T_ONS, log|diag R| summed.
 // ======================================================================
 (function lyapunov(){
-  const specC = $('ly-spec'), convC = $('ly-conv'); if (!specC) return;
-  const slider = $('ly-g'), gout = $('ly-gout'), readout = $('ly-readout');
-  const N = 80, DT = 0.05, STEPS = 6, QR_EVERY = 4, T_TRANS = 40;
-  const rng = mulberry32(1);
-  const W = new Float64Array(N*N); const s = 1/Math.sqrt(N);
-  for (let i=0;i<N*N;i++) W[i] = gauss(rng)*s;
-  const x = new Float64Array(N), th = new Float64Array(N), D = new Float64Array(N), dx = new Float64Array(N);
-  const Q = new Float64Array(N*N), JQ = new Float64Array(N*N), WD = new Float64Array(N*N);
-  const S = new Float64Array(N), est = new Float64Array(N);
-  let g = parseFloat(slider.value), t = 0, tAvg = 0, nstep = 0, hist = [];
-  const kr = mulberry32(99);
+  const eigC = $('ly-eig'), specC = $('ly-spec'), convC = $('ly-conv');
+  const NETS = window.LYAP_NETS;
+  if (!specC || !NETS) return;
+  const N = NETS.N, K = 24;                    // track the K largest exponents
+  const DT = 0.05, T_ONS = 1.0, T_TRANS = 40, T_WARM = 20, STEPS = 6;
+  const M_ONS = Math.round(T_ONS / DT);
 
-  function reset(){
-    for (let i=0;i<N;i++) x[i] = gauss(kr);
-    Q.fill(0); for (let i=0;i<N;i++) Q[i*N+i] = 1;   // Q stored row-major: Q[i*N + j] is row i, column j
-    S.fill(0); est.fill(0); t = 0; tAvg = 0; nstep = 0; hist = [];
+  function decode(b64){
+    const s = atob(b64), u = new Uint8Array(s.length);
+    for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i);
+    return Float64Array.from(new Float32Array(u.buffer));
   }
-  function qr(){
-    // modified Gram-Schmidt on columns of Q; accumulate log of diagonal of R after the transient
-    for (let j=0;j<N;j++){
-      for (let k=0;k<j;k++){
-        let d=0; for (let i=0;i<N;i++) d += Q[i*N+k]*Q[i*N+j];
-        for (let i=0;i<N;i++) Q[i*N+j] -= d*Q[i*N+k];
+  const BASE = { random: decode(NETS.W.random), dc: decode(NETS.W.dc) };
+
+  const slider = $('ly-g'), gout = $('ly-gout'), readout = $('ly-readout');
+  const bR = $('ly-random'), bD = $('ly-dc');
+  let model = 'dc', g = parseFloat(slider.value);
+  const W = new Float64Array(N*N);
+  const x = new Float64Array(N), th = new Float64Array(N);
+  const xs = [x, new Float64Array(N), new Float64Array(N), new Float64Array(N)];
+  const ks = [0,1,2,3].map(() => new Float64Array(N));
+  const Q = new Float64Array(N*K), Qs = new Float64Array(N*K), Dk = [0,1,2,3].map(() => new Float64Array(N*K));
+  const D = new Float64Array(N);
+  const S = new Float64Array(K), est = new Float64Array(K);
+  let tState = 0, nStep = 0, tAvg = 0, hist = [];
+  const icRng = mulberry32(2026);
+
+  function setW(){ const B = BASE[model]; for (let i = 0; i < N*N; i++) W[i] = g * B[i]; }
+
+  function f(xin, out){                       // out = -x + W tanh(x)
+    for (let j = 0; j < N; j++) th[j] = Math.tanh(xin[j]);
+    for (let i = 0; i < N; i++){ let a = 0; const o = i*N; for (let j = 0; j < N; j++) a += W[o+j]*th[j]; out[i] = -xin[i] + a; }
+  }
+  function Jmul(xin, V, out){                 // out = J(xin) V,  J = -I + W diag(1 - tanh^2)
+    for (let j = 0; j < N; j++){ const t = Math.tanh(xin[j]); D[j] = 1 - t*t; }
+    for (let i = 0; i < N; i++){
+      const o = i*N, oi = i*K;
+      for (let c = 0; c < K; c++) out[oi+c] = -V[oi+c];
+      for (let j = 0; j < N; j++){
+        const w = W[o+j]*D[j]; if (w === 0) continue;
+        const oj = j*K;
+        for (let c = 0; c < K; c++) out[oi+c] += w*V[oj+c];
       }
-      let nrm=0; for (let i=0;i<N;i++) nrm += Q[i*N+j]*Q[i*N+j]; nrm = Math.sqrt(nrm);
-      for (let i=0;i<N;i++) Q[i*N+j] /= nrm;
-      if (t > T_TRANS) S[j] += Math.log(nrm);
     }
+  }
+  function stateStep(){                        // RK4, state only
+    f(x, ks[0]);
+    for (let i = 0; i < N; i++) xs[1][i] = x[i] + 0.5*DT*ks[0][i]; f(xs[1], ks[1]);
+    for (let i = 0; i < N; i++) xs[2][i] = x[i] + 0.5*DT*ks[1][i]; f(xs[2], ks[2]);
+    for (let i = 0; i < N; i++) xs[3][i] = x[i] + DT*ks[2][i];     f(xs[3], ks[3]);
+    for (let i = 0; i < N; i++) x[i] += DT/6*(ks[0][i] + 2*ks[1][i] + 2*ks[2][i] + ks[3][i]);
+  }
+  function tangentStep(){                      // RK4 state + exact RK4 tangent map
+    f(x, ks[0]);
+    for (let i = 0; i < N; i++) xs[1][i] = x[i] + 0.5*DT*ks[0][i]; f(xs[1], ks[1]);
+    for (let i = 0; i < N; i++) xs[2][i] = x[i] + 0.5*DT*ks[1][i]; f(xs[2], ks[2]);
+    for (let i = 0; i < N; i++) xs[3][i] = x[i] + DT*ks[2][i];     f(xs[3], ks[3]);
+    Jmul(x, Q, Dk[0]);
+    for (let i = 0; i < N*K; i++) Qs[i] = Q[i] + 0.5*DT*Dk[0][i]; Jmul(xs[1], Qs, Dk[1]);
+    for (let i = 0; i < N*K; i++) Qs[i] = Q[i] + 0.5*DT*Dk[1][i]; Jmul(xs[2], Qs, Dk[2]);
+    for (let i = 0; i < N*K; i++) Qs[i] = Q[i] + DT*Dk[2][i];     Jmul(xs[3], Qs, Dk[3]);
+    for (let i = 0; i < N; i++) x[i] += DT/6*(ks[0][i] + 2*ks[1][i] + 2*ks[2][i] + ks[3][i]);
+    for (let i = 0; i < N*K; i++) Q[i] += DT/6*(Dk[0][i] + 2*Dk[1][i] + 2*Dk[2][i] + Dk[3][i]);
+  }
+  function qr(accumulate){                     // modified Gram-Schmidt on the K columns of Q
+    for (let c = 0; c < K; c++){
+      for (let p = 0; p < c; p++){
+        let d = 0; for (let i = 0; i < N; i++) d += Q[i*K+p]*Q[i*K+c];
+        for (let i = 0; i < N; i++) Q[i*K+c] -= d*Q[i*K+p];
+      }
+      let n = 0; for (let i = 0; i < N; i++) n += Q[i*K+c]*Q[i*K+c]; n = Math.sqrt(n);
+      for (let i = 0; i < N; i++) Q[i*K+c] /= n;
+      if (accumulate) S[c] += Math.log(n);
+    }
+  }
+  function reset(){
+    setW();
+    for (let i = 0; i < N; i++) x[i] = gauss(icRng);
+    for (let i = 0; i < N*K; i++) Q[i] = gauss(icRng);
+    qr(false);
+    for (let k = 0; k < Math.round(T_TRANS/DT); k++) stateStep();   // state-only transient
+    S.fill(0); est.fill(0); tState = 0; nStep = 0; tAvg = 0; hist = [];
   }
   function step(){
-    for (let i=0;i<N;i++){ th[i] = Math.tanh(x[i]); D[i] = 1 - th[i]*th[i]; }
-    for (let i=0;i<N;i++){ let acc=0; const o=i*N; for (let j=0;j<N;j++){ acc += W[o+j]*th[j]; WD[o+j] = g*W[o+j]*D[j]; } dx[i] = -x[i] + g*acc; }
-    // JQ = (-I + WD) Q ; Euler update of the tangent vectors uses the same step as the state
-    for (let i=0;i<N;i++){ const o=i*N; for (let j=0;j<N;j++){ let acc = -Q[o+j]; for (let k=0;k<N;k++) acc += WD[o+k]*Q[k*N+j]; JQ[o+j] = acc; } }
-    for (let i=0;i<N*N;i++) Q[i] += DT*JQ[i];
-    for (let i=0;i<N;i++) x[i] += DT*dx[i];
-    t += DT; nstep++;
-    if (nstep % QR_EVERY === 0){
-      qr();
-      if (t > T_TRANS){ tAvg = t - T_TRANS; for (let j=0;j<N;j++) est[j] = S[j]/tAvg; hist.push([tAvg, est[0]]); if (hist.length > 4000) hist.splice(0, hist.length - 4000); }
+    tangentStep(); nStep++; tState += DT;
+    if (nStep % M_ONS === 0){
+      const acc = tState > T_WARM + 1e-9;
+      qr(acc);
+      if (acc){
+        tAvg = tState - T_WARM;
+        for (let c = 0; c < K; c++) est[c] = S[c] / tAvg;
+        hist.push([tAvg, Math.max(...est)]);
+        if (hist.length > 3000) hist.splice(0, hist.length - 3000);
+      }
     }
   }
-  function kyDim(){
+  const sorted = () => Array.from(est).sort((a,b) => b - a);
+  function kyDim(e){
     let sum = 0;
-    for (let k=0;k<N;k++){ if (sum + est[k] < 0) return k === 0 ? 0 : k + sum/Math.abs(est[k]); sum += est[k]; }
-    return N;
+    for (let k = 0; k < e.length; k++){ if (sum + e[k] < 0) return k === 0 ? 0 : k + sum/Math.abs(e[k]); sum += e[k]; }
+    return null;                               // needs more than K exponents
+  }
+
+  function drawEig(){
+    if (!eigC) return;
+    const [ctx,w,h] = fit(eigC);
+    const muted=css('--muted'), rule=css('--rule'), ord=css('--ordered'), cha=css('--chaotic');
+    ctx.clearRect(0,0,w,h);
+    const R = Math.max(1.6, 1.15*g), pad = 14, sc = (Math.min(w,h)/2 - pad)/R, cx = w/2, cy = h/2 + 8;
+    const X = v => cx + v*sc, Y = v => cy - v*sc;
+    ctx.strokeStyle = rule; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(X(-R),cy); ctx.lineTo(X(R),cy); ctx.moveTo(cx,Y(R)); ctx.lineTo(cx,Y(-R)); ctx.stroke();
+    ctx.strokeStyle = cha; ctx.lineWidth = 1.25;
+    ctx.beginPath(); ctx.moveTo(X(1),Y(R)); ctx.lineTo(X(1),Y(-R)); ctx.stroke();
+    ctx.fillStyle = cha; ctx.font = FONT_I; ctx.fillText('Re = 1', X(1)+5, Y(R)+14);
+    ctx.fillStyle = muted; ctx.font = FONT; ctx.fillText('Eigenvalues of ', 8, 17);
+    const off = 8 + ctx.measureText('Eigenvalues of ').width; ctx.font = FONT_I; ctx.fillText('gW', off, 17);
+    for (const [re,im] of NETS.eig[model]){ const a=g*re, b=g*im; ctx.fillStyle = a>1?cha:ord; ctx.beginPath(); ctx.arc(X(a),Y(b),2.3,0,2*Math.PI); ctx.fill(); }
   }
   function drawSpec(){
     const [ctx,w,h] = fit(specC);
     const muted=css('--muted'), rule=css('--rule'), ord=css('--ordered'), cha=css('--chaotic');
     ctx.clearRect(0,0,w,h);
-    const L = 34, R = w-10, top = 30, bot = h-26, YMAX = 0.6, YMIN = -2.4;
+    const L = 34, R = w-10, top = 30, bot = h-26, YMAX = 0.6, YMIN = -0.8;
     const Y = v => top + (YMAX - Math.max(YMIN, Math.min(YMAX, v)))/(YMAX-YMIN)*(bot-top);
-    const X = i => L + (R-L)*(i+0.5)/N;
+    const X = i => L + (R-L)*(i+0.5)/K;
     ctx.strokeStyle = rule; ctx.lineWidth = 1;
-    for (const v of [0.5,-1,-2]){ ctx.beginPath(); ctx.moveTo(L,Y(v)); ctx.lineTo(R,Y(v)); ctx.stroke(); }
+    for (const v of [0.4,-0.4,-0.8]){ ctx.beginPath(); ctx.moveTo(L,Y(v)); ctx.lineTo(R,Y(v)); ctx.stroke(); }
     ctx.strokeStyle = muted; ctx.beginPath(); ctx.moveTo(L,Y(0)); ctx.lineTo(R,Y(0)); ctx.stroke();
     ctx.fillStyle = muted; ctx.font = FONT; ctx.textAlign = 'right';
-    for (const v of [0.5,0,-1,-2]) ctx.fillText(v.toString().replace('-','−'), L-6, Y(v)+4);
-    ctx.textAlign = 'left'; ctx.fillText('Lyapunov exponents, largest to smallest', L, 17);
-    ctx.fillText('index', R-30, h-8);
+    for (const v of [0.4,0,-0.4,-0.8]) ctx.fillText(v.toFixed(1).replace('-','−').replace(/^0\.0$/,'0'), L-6, Y(v)+4);
+    ctx.textAlign = 'left'; ctx.fillText(`Largest ${K} Lyapunov exponents`, L, 17);
     if (tAvg <= 0){ ctx.fillText('Settling past the transient…', L+8, (top+bot)/2); return; }
-    for (let i=0;i<N;i++){ ctx.fillStyle = est[i] > 0.005 ? cha : ord; ctx.beginPath(); ctx.arc(X(i), Y(est[i]), 2.6, 0, 2*Math.PI); ctx.fill(); }
+    const e = sorted();
+    for (let i = 0; i < K; i++){ ctx.fillStyle = e[i] > 0.01 ? cha : ord; ctx.beginPath(); ctx.arc(X(i), Y(e[i]), 2.8, 0, 2*Math.PI); ctx.fill(); }
   }
   function drawConv(){
     const [ctx,w,h] = fit(convC);
@@ -407,11 +481,11 @@ function loop(el, frame){
     ctx.clearRect(0,0,w,h);
     const L = 34, R = w-10, top = 30, bot = h-26;
     ctx.fillStyle = muted; ctx.font = FONT; ctx.fillText('Largest exponent, running estimate', 10, 17);
-    if (hist.length < 2){ return; }
+    if (hist.length < 2) return;
     const tmax = Math.max(50, hist[hist.length-1][0]);
     let lo = Infinity, hi = -Infinity; const from = hist.findIndex(p => p[0] > tmax*0.15);
-    for (let i=Math.max(0,from);i<hist.length;i++){ lo = Math.min(lo,hist[i][1]); hi = Math.max(hi,hist[i][1]); }
-    lo = Math.min(lo, -0.05); hi = Math.max(hi, 0.05); const padv = (hi-lo)*0.15; lo -= padv; hi += padv;
+    for (let i=Math.max(0,from);i<hist.length;i++){ lo=Math.min(lo,hist[i][1]); hi=Math.max(hi,hist[i][1]); }
+    lo = Math.min(lo, -0.05); hi = Math.max(hi, 0.05); const pv = (hi-lo)*0.15; lo -= pv; hi += pv;
     const X = t => L + (R-L)*t/tmax, Y = v => top + (hi - Math.max(lo,Math.min(hi,v)))/(hi-lo)*(bot-top);
     ctx.strokeStyle = rule; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(L,Y(0)); ctx.lineTo(R,Y(0)); ctx.stroke();
     ctx.textAlign = 'right'; ctx.fillText('0', L-6, Y(0)+4); ctx.textAlign = 'left';
@@ -421,27 +495,31 @@ function loop(el, frame){
   }
   function describe(){
     gout.textContent = g.toFixed(2);
-    if (tAvg < 30){ readout.innerHTML = 'Averaging the exponents along the trajectory…'; return; }
-    const l1 = est[0];
+    const name = model === 'dc' ? 'Dynamically critical' : 'Random';
+    if (tAvg < 30){ readout.innerHTML = `${name} network. Averaging along the trajectory…`; return; }
+    const e = sorted(), l1 = e[0], npos = e.filter(v => v > 0.01).length;
     if (l1 > 0.01){
-      readout.innerHTML = `<span class="state-chaotic">Chaotic.</span> The largest exponent is about ${l1.toFixed(3)} per time constant, so nearby states separate exponentially. Kaplan–Yorke dimension ≈ ${kyDim().toFixed(1)}.`;
+      const d = kyDim(e);
+      readout.innerHTML = `${name} network: <span class="state-chaotic">chaotic</span>. Largest exponent ≈ ${l1.toFixed(2)} per time constant, ${npos} positive, Kaplan–Yorke dimension ≈ ${d === null ? `more than ${K}` : d.toFixed(1)}.`;
     } else if (l1 > -0.01){
-      readout.innerHTML = `<span class="state-ordered">Marginal.</span> The largest exponent is about ${l1.toFixed(3)}, close to zero: activity neither converges nor separates, as on a limit cycle or torus.`;
+      readout.innerHTML = `${name} network: <span class="state-ordered">marginal</span>. Largest exponent ≈ ${l1.toFixed(3)}, close to zero, as on a cycle or torus.`;
     } else {
-      readout.innerHTML = `<span class="state-ordered">Stable.</span> All exponents are negative (largest ≈ ${l1.toFixed(3)}), so nearby states converge and activity settles.`;
+      readout.innerHTML = `${name} network: <span class="state-ordered">stable</span>. Every exponent is negative (largest ≈ ${l1.toFixed(2)}), so activity settles.`;
     }
   }
-  slider.addEventListener('input', () => { g = parseFloat(slider.value); gout.textContent = g.toFixed(2); });
-  slider.addEventListener('change', () => { reset(); describe(); drawSpec(); drawConv(); });
-  $('ly-restart').addEventListener('click', () => { reset(); describe(); drawSpec(); drawConv(); });
-  let frames = 0;
+  function restart(){ reset(); describe(); drawEig(); drawSpec(); drawConv(); if (reduce){ run(Math.round(200/DT)); describe(); drawSpec(); drawConv(); } }
   function run(n){ for (let k=0;k<n;k++) step(); }
+  function setModel(m){ model = m; bR.setAttribute('aria-pressed', m==='random'); bD.setAttribute('aria-pressed', m==='dc'); restart(); }
+
+  slider.addEventListener('input', () => { g = parseFloat(slider.value); gout.textContent = g.toFixed(2); setW(); drawEig(); });
+  slider.addEventListener('change', restart);
+  bR.addEventListener('click', () => setModel('random'));
+  bD.addEventListener('click', () => setModel('dc'));
+  $('ly-restart').addEventListener('click', restart);
+  let frames = 0;
   loop(specC, () => { run(STEPS); if (++frames % 3 === 0) describe(); drawSpec(); drawConv(); });
-  reset();
-  if (reduce){ run(Math.round((T_TRANS+200)/DT)); }
-  describe(); drawSpec(); drawConv(); onRedraw(() => { drawSpec(); drawConv(); });
-  // expose for verification in tests
-  window.__lyap = { setG: v => { g = v; reset(); }, run, est, get t(){ return t; }, W, N };
+  setModel('dc'); onRedraw(() => { drawEig(); drawSpec(); drawConv(); });
+  window.__lyap = { set: (m, gv) => { model = m; g = gv; reset(); }, run, est: () => sorted(), get tAvg(){ return tAvg; } };
 })();
 
 })();

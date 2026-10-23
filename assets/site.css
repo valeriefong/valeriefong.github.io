@@ -48,6 +48,7 @@ a{color:inherit;text-decoration-thickness:1px;text-underline-offset:.18em;text-d
 a:hover{text-decoration-color:var(--ink)}
 :focus-visible{outline:2px solid var(--ordered);outline-offset:3px;border-radius:2px}
 i.m{font-style:italic}
+code{font-family:inherit;font-size:1em}
 h1,h2,h3{text-wrap:balance}
 
 /* ---------- navigation ---------- */
@@ -121,8 +122,9 @@ dl.kit dd{margin:0;color:var(--ink)}
 .seq-panels{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:.9rem}
 .seq-panels .traj{aspect-ratio:1/1}
 .seq-panels .plot{min-height:16rem}
-.ly-panels{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:.9rem}
+.ly-panels{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr) minmax(0,1fr);gap:.9rem}
 .ly-panels .panel{min-height:16rem}
+.ly-panels .eig{aspect-ratio:1/1;min-height:0}
 figure.still{margin-block:1.5rem 2rem}
 figure.still a{display:block}
 figure.still img{display:block;width:100%;max-width:100%;height:auto;border:1px solid var(--rule);border-radius:3px;background:var(--plate);padding:.6rem}
@@ -160,6 +162,7 @@ details.partner p{margin:.7rem 0 0;color:var(--ink)}
   .intro-grid .portrait{order:-1;margin:1.5rem 0 0;width:9.5rem}
   .preview{grid-template-columns:1fr}
   .gain-panels,.seq-panels,.ly-panels{grid-template-columns:1fr}
+  .ly-panels .eig{max-width:21rem;width:100%;justify-self:center}
   .gain-panels .spec,.seq-panels .traj{max-width:21rem;width:100%;justify-self:center}
   dl.cv,dl.kit{grid-template-columns:1fr;gap:.2rem}
   dl.cv dd,dl.kit dd{margin-bottom:1rem}

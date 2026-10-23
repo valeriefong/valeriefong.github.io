@@ -105,20 +105,25 @@
 
   <figure class="interactive wide">
     <div class="ly-panels">
-      <div class="panel"><canvas id="ly-spec" role="img" aria-label="The Lyapunov spectrum, estimated live, with positive exponents highlighted."></canvas></div>
+      <div class="panel eig"><canvas id="ly-eig" role="img" aria-label="Eigenvalues of the scaled connectivity matrix for the selected network, with the stability boundary at real part one."></canvas></div>
+      <div class="panel"><canvas id="ly-spec" role="img" aria-label="The 24 largest Lyapunov exponents, estimated live, with positive exponents highlighted."></canvas></div>
       <div class="panel"><canvas id="ly-conv" role="img" aria-label="Running estimate of the largest Lyapunov exponent as averaging time grows."></canvas></div>
     </div>
     <div class="controls">
-      <label for="ly-g">Gain <i class="m">g</i> = <output id="ly-gout" for="ly-g">2.50</output></label>
-      <input id="ly-g" type="range" min="0.5" max="3.5" step="0.05" value="2.50">
+      <div class="seg" role="group" aria-label="Connectivity">
+        <button id="ly-dc" type="button" aria-pressed="true">Dynamically critical</button>
+        <button id="ly-random" type="button" aria-pressed="false">Random</button>
+      </div>
+      <label for="ly-g">Gain <i class="m">g</i> = <output id="ly-gout" for="ly-g">2.00</output></label>
+      <input id="ly-g" type="range" min="0.5" max="3" step="0.05" value="2.00">
       <button id="ly-restart" type="button">Restart the estimate</button>
     </div>
     <p class="readout" id="ly-readout" aria-live="polite"></p>
-    <figcaption><b>Figure 6.</b> Computed live in your browser for the classical random network with 80 units, <i class="m">dx/dt</i> = −<i class="m">x</i> + <i class="m">gW</i> tanh(<i class="m">x</i>). The state and 80 perturbation vectors advance by Euler steps of 0.05, reorthonormalizing every 0.2 time units after a transient of 40. Left: all 80 exponents, per time constant. Right: the largest one settling as the average grows. Below <i class="m">g</i> = 1 every exponent is negative. In a network this small, activity just above the transition often settles onto a cycle, with the largest exponent near zero; clear chaos, with a positive exponent, appears at larger gain.</figcaption>
+    <figcaption><b>Figure 6.</b> Computed live in your browser, with connectivity built by my <code>rnn_lyapunov</code> code. Both networks have 80 units and follow <i class="m">dx/dt</i> = −<i class="m">x</i> + <i class="m">gW</i> tanh(<i class="m">x</i>), and both start from the same random matrix (seed 0). In the dynamically critical one, 30% of the eigenvalues, the 12 complex pairs nearest the boundary, are moved to real part 0.99 with their frequencies kept. Left: eigenvalues of <i class="m">gW</i>. Middle: the 24 largest Lyapunov exponents, per time constant. Right: the largest one as the average grows. The state advances by fourth-order Runge–Kutta steps of 0.05 and the perturbation vectors by the exact tangent map of each step, with QR reorthonormalization every time unit after a transient of 40 and a warm-up of 20. These are short averages in a small network, so the numbers fluctuate. At this size a random network often settles onto a cycle or torus instead of becoming chaotic, which is one reason my production runs use 1,000 units.</figcaption>
   </figure>
 
   <div class="wrap">
-    <p>The next step is the comparison this demo can’t show yet: the same computation with dynamically critical connectivity, asking whether more exponents sit near zero at the transition than in the classical network.</p>
+    <p>The question this sets up, and what my larger simulations are for, is how the two spectra differ in large networks across the transition: how many exponents sit near zero, how high-dimensional the attractor becomes, and how both change with gain.</p>
   </div>
 </section>
 
@@ -139,6 +144,7 @@
   <p><a href="https://www.linkedin.com/in/valfong/">linkedin.com/in/valfong</a></p>
 </footer>
 
+<script src="assets/js/lyap-nets.js"></script>
 <script src="assets/js/viz.js"></script>
 </body>
 </html>
