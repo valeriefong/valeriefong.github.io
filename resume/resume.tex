@@ -1,0 +1,148 @@
+
+% Valerie Fong — one-page quantitative research / data science resume
+% Build: pdflatex resume.tex
+\documentclass[10pt,letterpaper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[top=0.45in,bottom=0.45in,left=0.55in,right=0.55in]{geometry}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage[hidelinks,pdfusetitle]{hyperref}
+\usepackage{microtype}
+\hyphenpenalty=10000
+\exhyphenpenalty=10000
+
+% Improve PDF text extraction and ATS parsing
+\input{glyphtounicode}
+\pdfgentounicode=1
+
+\hypersetup{
+  pdftitle={Valerie Fong Resume},
+  pdfauthor={Valerie Fong}
+}
+
+\definecolor{ink}{HTML}{000000}
+\definecolor{muted}{HTML}{000000}
+\definecolor{accent}{HTML}{000000}
+\definecolor{rule}{HTML}{000000}
+\definecolor{sep}{HTML}{000000}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+\renewcommand{\baselinestretch}{1}
+\AtBeginDocument{\fontsize{10.2}{13}\selectfont\color{ink}}
+
+% Section headings
+\titleformat{\section}
+  {\fontsize{11.5}{13}\selectfont\bfseries\color{accent}}
+  {}{0pt}{\MakeUppercase}
+  [{\vspace{1pt}\color{rule}\titlerule[0.5pt]}]
+\titlespacing*{\section}{0pt}{7pt}{3.5pt}
+
+\setlist[itemize]{
+  leftmargin=12pt,
+  labelsep=5pt,
+  topsep=1pt,
+  itemsep=1.2pt,
+  parsep=0pt,
+  partopsep=0pt,
+  label=\textbullet
+}
+
+% \entry{left}{date}
+\newcommand{\entry}[2]{%
+  \noindent#1\hfill
+  {\fontsize{9.8}{12}\selectfont\color{muted}#2}\par
+}
+\newcommand{\sub}[1]{{\itshape\color{muted}#1\par}}
+\newcommand{\gap}{\vspace{4pt}}
+\newcommand{\cbar}{{\color{sep}\enspace|\enspace}}
+
+\begin{document}
+
+\begin{center}
+{\fontsize{21}{24}\selectfont Valerie Fong}\par\vspace{2pt}
+{\fontsize{9.8}{12}\selectfont\color{muted}%
+\href{mailto:valfong@ucdavis.edu}{valfong@ucdavis.edu}\cbar
+505-850-3795\cbar
+\href{https://valeriefong.github.io}{valeriefong.github.io}\cbar
+\href{https://github.com/valeriefong}{github.com/valeriefong}\cbar
+\href{https://linkedin.com/in/valfong}{linkedin.com/in/valfong}}
+\end{center}
+\vspace{-8pt}
+
+\section*{Education}
+
+\entry{\textbf{University of California, Davis}, Ph.D. in Applied Mathematics}
+{Expected Dec 2027}
+\sub{Dissertation: Temporal Computation through Dynamically Critical Networks. Advisor: Rishidev Chaudhuri.}
+
+\gap
+\entry{\textbf{University of California, Davis}, M.S. in Applied Mathematics}
+{2024}
+
+\gap
+\entry{\textbf{University of New Mexico}, B.S. in Statistics and Economics, minor in Mathematics}
+{2022}
+\sub{Phi Beta Kappa}
+\gap
+\textbf{Fellowships:} NSF Graduate Research Fellowship; National GEM Consortium Ph.D. Fellowship; UC Davis Hazel B. Jacoby Fellowship
+
+\section*{Research Experience}
+
+\entry{\textbf{University of California, Davis}, Graduate Student Researcher}
+{2022 -- Present}
+\begin{itemize}
+  \item Developed a Python/PyTorch simulation pipeline with SLURM job arrays to study Lyapunov spectra in 3 recurrent network models, scaling to $N=2{,}000$ across 1,060 parameter combinations and approximately 25,000 simulation runs.
+  \item Adapted and extended a published Lyapunov-spectrum solver using the QR/Benettin method, fixed-step RK4 integration, and tangent dynamics; validated the pipeline against the reference implementation and assessed numerical convergence through paired comparisons of step size, orthonormalization interval, simulation duration, precision, and network size.
+  \item Executed the resulting computational study on an HPC cluster, using approximately 70,000 CPU core-hours to characterize how network size, model architecture, and connectivity gain shape Lyapunov spectra.
+  \item Explored Dynamic Mode Decomposition on high-dimensional neural recordings, working with the experimental neuroscientists who collected the data to understand its biological and experimental context.
+\end{itemize}
+
+\gap
+\entry{\textbf{University of New Mexico}, Ronald E. McNair Scholar and ASSURE Fellow}
+{2021 -- 2022}
+\begin{itemize}
+  \item Applied variance-based Sobol' global sensitivity analysis to quantify how uncertainty in eight model parameters influences Hodgkin--Huxley neuron model outputs across hundreds of thousands of simulations.
+  \item Presented research findings at three national McNair research conferences.
+\end{itemize}
+
+\section*{Professional Experience}
+
+\entry{\textbf{iRhythm Technologies}, Data Science Intern}
+{Jun -- Aug 2022}
+\begin{itemize}
+  \item Built and benchmarked time-series demand forecasting models, including ARIMA, convolutional neural networks, empirical mode decomposition, and seasonal-trend decomposition.
+  \item Compared forecasting approaches across multiple error metrics and applied k-means clustering and principal component analysis (PCA) to investigate patterns in demand data.
+\end{itemize}
+
+\gap
+\entry{\textbf{Sandia National Laboratories}, Year-Round R\&D Intern}
+{2019 -- 2021}
+\begin{itemize}
+  \item Developed and maintained a dashboard of safety, security, quality, and environmental metrics to support leadership decision-making.
+  \item Earned Lean Six Sigma Green Belt certification; held a U.S. Department of Energy Q clearance.
+\end{itemize}
+
+\section*{Teaching}
+
+\entry{\textbf{Private Tutor}, Calculus and Ordinary Differential Equations}
+{2026}
+
+\gap
+\entry{\textbf{Peer Learning Facilitator}, Advanced Data Analysis I \& II (University of New Mexico)}
+{2021 -- 2022}
+
+\section*{Technical Skills}\raggedright
+
+\textbf{Programming:} Python (NumPy, SciPy, pandas, scikit-learn, Matplotlib, PyTorch), R, MATLAB, Git, LaTeX, HPC/SLURM\par\vspace{2pt}
+
+\textbf{Statistics and Modeling:} Time-series forecasting, statistical modeling, global sensitivity analysis, clustering, PCA\par\vspace{2pt}
+
+\textbf{Numerical Methods:} Numerical ODE integration, RK4, eigenspectral methods, Lyapunov exponents, QR/Benettin method, Dynamic Mode Decomposition, large-scale simulation
+
+\end{document}
