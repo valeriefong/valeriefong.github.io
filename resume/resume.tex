@@ -70,7 +70,7 @@
 \href{mailto:valfong@ucdavis.edu}{valfong@ucdavis.edu}\cbar
 505-850-3795\cbar
 \href{https://valeriefong.github.io}{valeriefong.github.io}\cbar
-\href{https://github.com/valeriefong}{github.com/valeriefong}\cbar
+% \href{https://github.com/valeriefong}{github.com/valeriefong}\cbar
 \href{https://linkedin.com/in/valfong}{linkedin.com/in/valfong}}
 \end{center}
 \vspace{-8pt}
@@ -97,9 +97,9 @@
 \entry{\textbf{University of California, Davis}, Graduate Student Researcher}
 {2022 -- Present}
 \begin{itemize}
-  \item Developed a Python/PyTorch simulation pipeline with SLURM job arrays to study Lyapunov spectra in 3 recurrent network models, scaling to $N=2{,}000$ across 1,060 parameter combinations and approximately 25,000 simulation runs.
-  \item Adapted and extended a published Lyapunov-spectrum solver using the QR/Benettin method, fixed-step RK4 integration, and tangent dynamics; validated the pipeline against the reference implementation and assessed numerical convergence through paired comparisons of step size, orthonormalization interval, simulation duration, precision, and network size.
-  \item Executed the resulting computational study on an HPC cluster, using approximately 70,000 CPU core-hours to characterize how network size, model architecture, and connectivity gain shape Lyapunov spectra.
+  \item Developed a Python/PyTorch simulation pipeline with SLURM job arrays to study Lyapunov spectra in three recurrent network models, scaling to $N=2{,}000$ neurons across 1,060 parameter combinations: about 25,000 simulation runs and 70,000 CPU core-hours on an HPC cluster.
+  \item Adapted and extended a published Lyapunov-spectrum solver using the QR/Benettin method, fixed-step RK4 integration, and tangent dynamics; validated the pipeline against a reference implementation and assessed numerical convergence through paired comparisons of step size, orthonormalization interval, simulation duration, precision, and network size.
+  \item Analyzing the resulting simulation dataset to determine how two stabilizing mechanisms shape the dependence of Lyapunov spectra on network size and gain, relative to a classical random-network baseline.
   \item Explored Dynamic Mode Decomposition on high-dimensional neural recordings, working with the experimental neuroscientists who collected the data to understand its biological and experimental context.
 \end{itemize}
 
@@ -107,7 +107,7 @@
 \entry{\textbf{University of New Mexico}, Ronald E. McNair Scholar and ASSURE Fellow}
 {2021 -- 2022}
 \begin{itemize}
-  \item Applied variance-based Sobol' global sensitivity analysis to quantify how uncertainty in eight model parameters influences Hodgkin--Huxley neuron model outputs across hundreds of thousands of simulations.
+  \item Applied variance-based Sobol' global sensitivity analysis to quantify how uncertainty in eight model parameters influences Hodgkin--Huxley single-neuron model outputs across hundreds of thousands of simulations.
   \item Presented research findings at three national McNair research conferences.
 \end{itemize}
 
@@ -116,7 +116,7 @@
 \entry{\textbf{iRhythm Technologies}, Data Science Intern}
 {Jun -- Aug 2022}
 \begin{itemize}
-  \item Built and benchmarked time-series demand forecasting models, including ARIMA, convolutional neural networks, empirical mode decomposition, and seasonal-trend decomposition.
+     \item Implemented time-series forecasting approaches (ARIMA, CNNs) and decomposition-based methods (empirical mode and seasonal-trend decomposition) to analyze product demand data.
   \item Compared forecasting approaches across multiple error metrics and applied k-means clustering and principal component analysis (PCA) to investigate patterns in demand data.
 \end{itemize}
 
@@ -124,13 +124,14 @@
 \entry{\textbf{Sandia National Laboratories}, Year-Round R\&D Intern}
 {2019 -- 2021}
 \begin{itemize}
-  \item Developed and maintained a dashboard of safety, security, quality, and environmental metrics to support leadership decision-making.
+  \item Consolidated and cleaned environmental, safety, and security incident data, reconciling records across multiple sources and formats.
+  \item Built Excel visualizations and maintained a dashboard of safety, security, quality, and environmental metrics for laboratory leadership.
   \item Earned Lean Six Sigma Green Belt certification; held a U.S. Department of Energy Q clearance.
 \end{itemize}
 
 \section*{Teaching}
 
-\entry{\textbf{Private Tutor}, Calculus and Ordinary Differential Equations}
+\entry{\textbf{Private Tutor}, Calculus, Ordinary Differential Equations, Matrix Algebra}
 {2026}
 
 \gap
@@ -139,10 +140,10 @@
 
 \section*{Technical Skills}\raggedright
 
-\textbf{Programming:} Python (NumPy, SciPy, pandas, scikit-learn, Matplotlib, PyTorch), R, MATLAB, Git, LaTeX, HPC/SLURM\par\vspace{2pt}
+\textbf{Programming:} Python (NumPy, SciPy, PyTorch, Pandas, Matplotlib), R, MATLAB, Git, LaTeX, HPC/SLURM\par\vspace{2pt}
 
-\textbf{Statistics and Modeling:} Time-series forecasting, statistical modeling, global sensitivity analysis, clustering, PCA\par\vspace{2pt}
+\textbf{Statistics and Modeling:} Time-series forecasting, regression modeling, global sensitivity analysis, clustering, PCA\par\vspace{2pt}
 
-\textbf{Numerical Methods:} Numerical ODE integration, RK4, eigenspectral methods, Lyapunov exponents, QR/Benettin method, Dynamic Mode Decomposition, large-scale simulation
+\textbf{Numerical Methods:} Numerical ODE integration, eigenspectral methods, numerical linear algebra, Lyapunov exponents, Dynamic Mode Decomposition, large-scale simulation
 
 \end{document}
