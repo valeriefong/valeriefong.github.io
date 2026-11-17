@@ -126,6 +126,11 @@ dl.kit dd{margin:0;color:var(--ink)}
 figure.still{margin-block:1.5rem 2rem}
 figure.still a{display:block}
 figure.still img{display:block;width:100%;max-width:100%;height:auto;border:1px solid var(--rule);border-radius:3px;background:var(--plate);padding:.6rem}
+figure.still.narrow{max-width:46rem;margin-inline:auto}
+section.block>figure.still.narrow{margin-inline:0}
+.project ul{margin:0 0 1rem;padding-left:1.2rem}
+.project li{margin-bottom:.4rem}
+.project h3{margin-top:2rem}
 .stage{margin-inline:auto;max-width:60rem}
 
 /* ---------- experience lists (home + cv) ---------- */

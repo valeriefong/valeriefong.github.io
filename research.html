@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Research · Valerie Fong</title>
-<meta name="description" content="Research by Valerie Fong on dynamically critical recurrent networks: sequence generation, self-tuning, and Lyapunov spectra.">
+<meta name="description" content="Research by Valerie Fong on dynamically critical recurrent networks: Lyapunov spectra, sequence generation, and self-tuning.">
 <meta property="og:title" content="Research · Valerie Fong">
-<meta property="og:description" content="Sequence generation, self-tuning networks, and Lyapunov spectra in dynamically critical recurrent networks.">
+<meta property="og:description" content="Lyapunov spectra, sequence generation, and self-tuning in dynamically critical recurrent networks.">
 <meta property="og:url" content="https://valeriefong.github.io/research.html">
 <meta property="og:type" content="website">
 <meta property="og:image" content="https://valeriefong.github.io/assets/og-card.png">
@@ -36,6 +36,64 @@
 
 <main>
 
+<!-- ============ Lyapunov ============ -->
+<section class="project" id="lyapunov" aria-labelledby="ly-h">
+  <div class="wrap">
+    <h2 id="ly-h">Lyapunov spectra of three recurrent network models</h2>
+    <p>This is the project I’m deepest into. The units of a recurrent network drive one another. When the coupling is weak, activity dies away. When it is strong enough, the network keeps itself active with no input, and two almost identical starting states drift apart. That sensitivity to the starting state is chaos.</p>
+  </div>
+  <figure class="still wide">
+    <a href="assets/figures/chaos-transition.webp"><img src="assets/figures/chaos-transition.webp" width="2400" height="1530" alt="Three columns labelled Stable, Chaotic and Strongly chaotic. Top row: a ring of eight units whose connections get thicker from left to right. Bottom row: activity of five units, which decays to zero in the first column and fluctuates irregularly, with growing amplitude, in the other two."></a>
+    <figcaption><b>Figure 1.</b> One random network of 1000 units, <i class="m">dx/dt</i> = −<i class="m">x</i> + <i class="m">gW</i> tanh(<i class="m">x</i>), at coupling strengths <i class="m">g</i> = 0.9, 2 and 5. The connectivity <i class="m">W</i> is the same in every column and only <i class="m">g</i> changes. Top: eight of the units and every connection among them. Orange is excitatory, grey is inhibitory, and stronger connections are thicker and darker. Bottom: activity of five units from one random starting state. The stable panel has its own, shorter axes so the decay is visible.</figcaption>
+  </figure>
+
+  <div class="wrap">
+    <h3 id="reading">Reading a Lyapunov spectrum</h3>
+    <p>A Lyapunov exponent is the average exponential rate at which a small perturbation grows or shrinks along one direction in state space. A network of <i class="m">N</i> units has <i class="m">N</i> of them, and sorted from largest to smallest they form its Lyapunov spectrum. I summarize a spectrum with three numbers:</p>
+    <ul>
+      <li>The largest exponent, λ<sub>1</sub>. If it is positive, the network is chaotic.</li>
+      <li>The sum of the positive exponents, <i class="m">H</i>, which estimates the entropy rate: how fast the dynamics produce new information.</li>
+      <li>The Kaplan–Yorke dimension, <i class="m">D</i>: how many exponents can be added, largest first, before the sum turns negative. It estimates the dimension of the set the activity settles onto.</li>
+    </ul>
+  </div>
+  <figure class="still wide">
+    <a href="assets/figures/spectrum-reading.svg"><img src="assets/figures/spectrum-reading.svg" width="1000" height="410" loading="lazy" alt="Left: 1000 Lyapunov exponents sorted from largest to smallest, falling from 0.41 to about −2.4, with the 37 positive ones shaded. Right: the first 120 exponents with their running sum, which rises to about 6.9 and returns to zero at index 79.3."></a>
+    <figcaption><b>Figure 2.</b> The Lyapunov spectrum of the <i class="m">g</i> = 5 network in Figure 1, from one run of my dataset: integrated with fourth-order Runge–Kutta at a step of 0.01 time constants, with exponents averaged over about 1000 time constants after a transient. Left: all 1000 exponents, of which 37 are positive. Right: the first 120 and their running sum (dashed, right axis). The shaded area is <i class="m">H</i> = 6.9 per time constant. The running sum returns to zero at <i class="m">D</i> = 79.3, so by this estimate the activity occupies about 79 of the 1000 available dimensions.</figcaption>
+  </figure>
+  <div class="wrap">
+    <p>I compute the full spectrum by evolving a set of perturbation vectors with the network’s Jacobian and reorthonormalizing them with a QR decomposition, following Engelken et al. (2023).</p>
+
+    <h3 id="models">Three ways to build the network</h3>
+    <p>The project compares three models, each chaotic for a different structural reason:</p>
+    <ul>
+      <li><b>Random.</b> The classical network of Sompolinsky, Crisanti and Sommers (1988), used as the baseline.</li>
+      <li><b>Dynamically critical.</b> Random connectivity in which the 30% of eigenvalues with the largest real part are moved to a common real part just below one before the gain is applied, so a large group of modes reaches the stability boundary together.</li>
+      <li><b>Barcode.</b> The model of Fang et al. (2025): random connectivity with net inhibition, and a leak on every unit that grows with the network’s total activity.</li>
+    </ul>
+  </div>
+  <figure class="still wide narrow">
+    <a href="assets/figures/three-models.webp"><img src="assets/figures/three-models.webp" width="2400" height="2200" loading="lazy" alt="Three columns labelled Random, Dynamically critical and Barcode. Top row: rings of eight units and their connections; the Dynamically critical ring has thick self-connections. Middle row: eigenvalues of each connectivity matrix; Random and Barcode fill a disc, while in Dynamically critical the right part of the disc is empty and those eigenvalues sit on a vertical line. Bottom row: irregular activity of five units in each network."></a>
+    <figcaption><b>Figure 3.</b> One 1000-unit network of each model at a gain where it is chaotic (Random and Dynamically critical at <i class="m">g</i> = 2, Barcode at <i class="m">g</i> = 7). Top: eight units and their connections, drawn as in Figure 1, with self-connections as loops. Middle: eigenvalues of the connectivity matrix, in units of <i class="m">g</i>, with a circle of radius <i class="m">g</i>. In the Dynamically critical network the moved eigenvalues line up on the right. The Barcode matrix has one more eigenvalue far to the left, near its mean inhibition μ = −40. Bottom: activity of five units.</figcaption>
+  </figure>
+  <div class="wrap">
+    <p>For each model I have computed full spectra for networks of 20 to 2000 units, at gains from below the transition to deep in the chaotic regime: 21,150 runs, with 20 networks per condition (10 for the largest Barcode networks). The question is how λ<sub>1</sub>, <i class="m">H</i>/<i class="m">N</i> and <i class="m">D</i>/<i class="m">N</i> depend on the gain and on network size in each model, and whether structured connectivity or an activity-dependent leak changes that dependence relative to the random baseline. The analysis is under way, and I’ll add the comparison here when the write-up is done.</p>
+  </div>
+
+  <figure class="interactive wide">
+    <div class="ly-panels">
+      <div class="panel"><canvas id="ly-spec" role="img" aria-label="The Lyapunov spectrum, estimated live, with positive exponents highlighted."></canvas></div>
+      <div class="panel"><canvas id="ly-conv" role="img" aria-label="Running estimate of the largest Lyapunov exponent as averaging time grows."></canvas></div>
+    </div>
+    <div class="controls">
+      <label for="ly-g">Gain <i class="m">g</i> = <output id="ly-gout" for="ly-g">2.50</output></label>
+      <input id="ly-g" type="range" min="0.5" max="3.5" step="0.05" value="2.50">
+      <button id="ly-restart" type="button">Restart the estimate</button>
+    </div>
+    <p class="readout" id="ly-readout" aria-live="polite"></p>
+    <figcaption><b>Figure 4.</b> A small version you can run. Computed live in your browser for the classical random network with 80 units, <i class="m">dx/dt</i> = −<i class="m">x</i> + <i class="m">gW</i> tanh(<i class="m">x</i>). The state and 80 perturbation vectors advance by Euler steps of 0.05, reorthonormalizing every 0.2 time units after a transient of 40. Left: all 80 exponents, per time constant. Right: the largest one settling as the average grows. Below <i class="m">g</i> = 1 every exponent is negative. In a network this small, activity just above the transition often settles onto a cycle, with the largest exponent near zero; clear chaos, with a positive exponent, appears at larger gain.</figcaption>
+  </figure>
+</section>
+
 <!-- ============ Sequence generation ============ -->
 <section class="project" id="sequences" aria-labelledby="seq-h">
   <div class="wrap">
@@ -55,7 +113,7 @@
       <button id="seq-new" type="button">New network</button>
     </div>
     <p class="readout" id="seq-readout" aria-live="polite"></p>
-    <figcaption><b>Figure 1.</b> Activity is a sum of <i class="m">K</i> oscillations with random frequencies and decay rates between 0.001 and 0.004 per time unit, so every mode is near critical. Right, top: cosine similarity between the state and its starting direction; the dashed line is the 0.9 threshold and the red mark is the first return. Right, bottom: four readout neurons, each tuned to the state at the moment marked by its triangle, responding in proportion to max(0, similarity − 0.9). Try a few modes, then many.</figcaption>
+    <figcaption><b>Figure 5.</b> Activity is a sum of <i class="m">K</i> oscillations with random frequencies and decay rates between 0.001 and 0.004 per time unit, so every mode is near critical. Right, top: cosine similarity between the state and its starting direction; the dashed line is the 0.9 threshold and the red mark is the first return. Right, bottom: four readout neurons, each tuned to the state at the moment marked by its triangle, responding in proportion to max(0, similarity − 0.9). Try a few modes, then many.</figcaption>
   </figure>
 
   <div class="wrap">
@@ -63,7 +121,7 @@
   </div>
   <figure class="still wide">
     <a href="assets/figures/dcn-spectrum.webp"><img src="assets/figures/dcn-spectrum.webp" width="2400" height="864" loading="lazy" alt="Three panels: eigenvalues of A clustered along the imaginary axis; activity traces of three units; the trajectory in three dimensions."></a>
-    <figcaption><b>Figure 2.</b> (A) Eigenvalues of <i class="m">A</i>, with many modes clustered at Re λ ≈ 0. (B) Activity of three units. (C) The same trajectory in three dimensions.</figcaption>
+    <figcaption><b>Figure 6.</b> (A) Eigenvalues of <i class="m">A</i>, with many modes clustered at Re λ ≈ 0. (B) Activity of three units. (C) The same trajectory in three dimensions.</figcaption>
   </figure>
 
   <div class="wrap">
@@ -71,7 +129,7 @@
   </div>
   <figure class="still wide">
     <a href="assets/figures/recurrence.webp"><img src="assets/figures/recurrence.webp" width="2400" height="968" loading="lazy" alt="Left: a trajectory returning near its starting direction. Right: recurrence time rising with network size on a log scale."></a>
-    <figcaption><b>Figure 3.</b> (A) Recurrence is the first time the trajectory’s direction (red) comes back within a small angle of its starting direction (black). (B) Recurrence time against network size <i class="m">N</i>, log scale. Each point summarizes 20 networks, each with its own connectivity and initial condition. Preliminary.</figcaption>
+    <figcaption><b>Figure 7.</b> (A) Recurrence is the first time the trajectory’s direction (red) comes back within a small angle of its starting direction (black). (B) Recurrence time against network size <i class="m">N</i>, log scale. Each point summarizes 20 networks, each with its own connectivity and initial condition. Preliminary.</figcaption>
   </figure>
 
   <div class="wrap">
@@ -79,7 +137,7 @@
   </div>
   <figure class="still wide">
     <a href="assets/figures/readout.webp"><img src="assets/figures/readout.webp" width="2400" height="612" loading="lazy" alt="Left: a trajectory crossing a readout hyperplane, producing a single pulse. Right: a recurrent network driving four readouts that peak at different times."></a>
-    <figcaption><b>Figure 4.</b> Schematic. (A) A readout with weights α fires when the trajectory crosses its hyperplane at time <i class="m">t̂</i>. (B) The network drives several readouts, each peaking at its own time.</figcaption>
+    <figcaption><b>Figure 8.</b> Schematic. (A) A readout with weights α fires when the trajectory crosses its hyperplane at time <i class="m">t̂</i>. (B) The network drives several readouts, each peaking at its own time.</figcaption>
   </figure>
 </section>
 
@@ -91,35 +149,8 @@
   </div>
   <figure class="still wide">
     <a href="assets/figures/self-tuning.webp"><img src="assets/figures/self-tuning.webp" width="2400" height="1078" loading="lazy" alt="Eigenvalues of W over time collapsing toward zero real part, with bounded oscillatory activity traces and a three-dimensional trajectory."></a>
-    <figcaption><b>Figure 5.</b> Eigenvalues of <i class="m">W</i> over time on a log scale: the real parts (black) collapse toward zero as the network tunes itself, while activity stays bounded and oscillatory.</figcaption>
+    <figcaption><b>Figure 9.</b> Eigenvalues of <i class="m">W</i> over time on a log scale: the real parts (black) collapse toward zero as the network tunes itself, while activity stays bounded and oscillatory.</figcaption>
   </figure>
-</section>
-
-<!-- ============ Lyapunov ============ -->
-<section class="project" id="lyapunov" aria-labelledby="ly-h">
-  <div class="wrap">
-    <h2 id="ly-h">Lyapunov spectra across the transition to chaos</h2>
-    <p>Add a nonlinearity and turn up the gain, and a network eventually loses stability. In the classical random network only a few eigenvalues reach the boundary first. With dynamically critical connectivity, many modes should lose stability almost together, and I want to know what that transition produces.</p>
-    <p>Lyapunov exponents are the right measurement. They give the average exponential rate at which nearby trajectories converge or separate, one for each direction in state space. I compute the full spectrum by evolving a set of perturbation vectors with the network’s Jacobian and reorthonormalizing them with a QR decomposition, following Engelken et al. (2020). From the spectrum come the Kaplan–Yorke dimension of the attractor and its entropy rate.</p>
-  </div>
-
-  <figure class="interactive wide">
-    <div class="ly-panels">
-      <div class="panel"><canvas id="ly-spec" role="img" aria-label="The Lyapunov spectrum, estimated live, with positive exponents highlighted."></canvas></div>
-      <div class="panel"><canvas id="ly-conv" role="img" aria-label="Running estimate of the largest Lyapunov exponent as averaging time grows."></canvas></div>
-    </div>
-    <div class="controls">
-      <label for="ly-g">Gain <i class="m">g</i> = <output id="ly-gout" for="ly-g">2.50</output></label>
-      <input id="ly-g" type="range" min="0.5" max="3.5" step="0.05" value="2.50">
-      <button id="ly-restart" type="button">Restart the estimate</button>
-    </div>
-    <p class="readout" id="ly-readout" aria-live="polite"></p>
-    <figcaption><b>Figure 6.</b> Computed live in your browser for the classical random network with 80 units, <i class="m">dx/dt</i> = −<i class="m">x</i> + <i class="m">gW</i> tanh(<i class="m">x</i>). The state and 80 perturbation vectors advance by Euler steps of 0.05, reorthonormalizing every 0.2 time units after a transient of 40. Left: all 80 exponents, per time constant. Right: the largest one settling as the average grows. Below <i class="m">g</i> = 1 every exponent is negative. In a network this small, activity just above the transition often settles onto a cycle, with the largest exponent near zero; clear chaos, with a positive exponent, appears at larger gain.</figcaption>
-  </figure>
-
-  <div class="wrap">
-    <p>The next step is the comparison this demo can’t show yet: the same computation with dynamically critical connectivity, asking whether more exponents sit near zero at the transition than in the classical network.</p>
-  </div>
 </section>
 
 <!-- ============ Data ============ -->
