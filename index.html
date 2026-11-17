@@ -48,12 +48,12 @@
 </div>
 
 <main>
-<section class="block wide" aria-labelledby="now-h">
+<section class="block wide" id="now" aria-labelledby="now-h">
   <h2 id="now-h">What I’m working on now</h2>
-  <p class="section-intro">I compute full Lyapunov spectra for three models of recurrent networks, to compare how chaos in each one depends on coupling strength and network size.</p>
-  <figure class="still narrow">
-    <a href="research.html#lyapunov"><img src="assets/figures/three-models.webp" width="2400" height="2200" alt="Three columns labelled Random, Dynamically critical and Barcode, each showing a small ring of connected units, the eigenvalues of the network’s connectivity matrix, and the irregular activity of five units."></a>
-    <figcaption>One 1000-unit network of each model in its chaotic regime: eight of its units and their connections, the eigenvalues of its connectivity matrix, and the activity of five units. <a href="research.html#lyapunov">How to read a Lyapunov spectrum, and what the three models are</a></figcaption>
+  <p class="section-intro">I compute full Lyapunov spectra for three models of recurrent networks, to compare how chaos in each one depends on coupling strength and network size. The units of a recurrent network drive one another. When the coupling is weak, activity dies away. When it is strong enough, the network keeps itself active with no input, and two almost identical starting states drift apart.</p>
+  <figure class="still">
+    <img src="assets/figures/chaos-transition.webp" width="2400" height="1530" alt="Three columns labelled Stable, Chaotic and Strongly chaotic. Top row: a ring of eight units whose connections get thicker from left to right. Bottom row: activity of five units, which decays to zero in the first column and fluctuates irregularly, with growing amplitude, in the other two.">
+    <figcaption>One random network of 1000 units, <i class="m">dx/dt</i> = −<i class="m">x</i> + <i class="m">gW</i> tanh(<i class="m">x</i>), at coupling strengths <i class="m">g</i> = 0.9, 2 and 5. The connectivity <i class="m">W</i> is the same in every column and only <i class="m">g</i> changes. Top: eight of the units and every connection among them. Orange is excitatory, grey is inhibitory, and stronger connections are thicker and darker. Bottom: activity of five units from one random starting state. The stable panel has its own, shorter axes so the decay is visible. <a href="research.html#lyapunov">The three models, and how the Lyapunov spectrum is computed</a></figcaption>
   </figure>
 </section>
 
