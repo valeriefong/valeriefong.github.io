@@ -63,66 +63,68 @@
   </ul>
 </section>
 
-<section class="block" aria-labelledby="exp-h">
-  <h2 id="exp-h">Industry experience</h2>
-  <dl class="cv">
-    <dt>Jun – Aug 2022</dt>
-    <dd><strong>Data Science Intern, iRhythm Technologies</strong>
-      <ul>
-        <li>Built and benchmarked demand-forecasting models (ARIMA, convolutional neural networks, empirical mode decomposition, seasonal-trend decomposition), comparing them across multiple error metrics to improve forecast accuracy.</li>
-        <li>Applied k-means clustering and PCA to identify demand trends.</li>
-      </ul>
-    </dd>
-    <dt>2019 – 2021</dt>
-    <dd><strong>Year-Round R&amp;D Intern, Sandia National Laboratories</strong>
-      <ul>
-        <li>Built and maintained a data visualization dashboard of safety, security, quality and environmental metrics used to support leadership decisions.</li>
-        <li>Supported cost-benefit analyses for a DOE carbon capture, utilization and storage program spanning national laboratories, geological surveys and universities.</li>
-        <li>Lean Six Sigma Green Belt. Held a DOE Q clearance.</li>
-      </ul>
-    </dd>
-  </dl>
-</section>
-
 <section class="block" aria-labelledby="res-h">
   <h2 id="res-h">Research experience</h2>
   <dl class="cv">
     <dt>2022 – present</dt>
-    <dd><strong>Graduate Student Researcher, UC Davis Department of Mathematics</strong>
+    <dd><strong>Graduate Student Researcher, University of California, Davis</strong>
       <ul>
-        <li>Develop theory and simulations of recurrent neural networks near a dynamical phase transition, studying how criticality supports long-timescale memory and sequence generation.</li>
-        <li>Built a Python simulation and analysis framework from scratch: numerical ODE integration, eigendecomposition pipelines, and Lyapunov spectrum computation by QR reorthonormalization.</li>
-        <li>Construct linear networks with many near-critical oscillatory modes, characterize how recurrence time scales with network size, and test whether timed sequences can be decoded by simple ReLU readout neurons.</li>
-        <li>Applied dynamic mode decomposition to learn linear dynamics from high-dimensional neural population recordings.</li>
+        <li>Developed a Python/PyTorch simulation pipeline with SLURM job arrays to study Lyapunov spectra in three recurrent network models, scaling to <i class="m">N</i> = 2,000 neurons across 1,060 parameter combinations: about 25,000 simulation runs and 70,000 CPU core-hours on an HPC cluster.</li>
+        <li>Adapted and extended a published Lyapunov-spectrum solver using the QR/Benettin method, fixed-step RK4 integration, and tangent dynamics; validated the pipeline against a reference implementation and assessed numerical convergence through paired comparisons of step size, orthonormalization interval, simulation duration, precision, and network size.</li>
+        <li>Analyzing the resulting simulation dataset to determine how two stabilizing mechanisms shape the dependence of Lyapunov spectra on network size and gain, relative to a classical random-network baseline.</li>
+        <li>Explored Dynamic Mode Decomposition on high-dimensional neural recordings, working with the experimental neuroscientists who collected the data to understand its biological and experimental context.</li>
       </ul>
     </dd>
     <dt>2021 – 2022</dt>
     <dd><strong>Ronald E. McNair Scholar and ASSURE Fellow, University of New Mexico</strong>
       <ul>
-        <li>Ran variance-based (Sobol’) global sensitivity analysis on the Hodgkin–Huxley neuron model: hundreds of thousands of simulations to estimate first- and total-order indices for eight parameters.</li>
-        <li>Presented results at three national McNair research conferences.</li>
+        <li>Applied variance-based Sobol’ global sensitivity analysis to quantify how uncertainty in eight model parameters influences Hodgkin–Huxley single-neuron model outputs across hundreds of thousands of simulations.</li>
+        <li>Presented research findings at three national McNair research conferences.</li>
       </ul>
     </dd>
   </dl>
 </section>
 
-<section class="block" aria-labelledby="skills-h">
-  <h2 id="skills-h">Skills</h2>
-  <dl class="kit">
-    <dt>Programming</dt>
-    <dd>Python (NumPy, SciPy, Matplotlib), R, MATLAB, Git, LaTeX, high-performance computing</dd>
-    <dt>Statistics and ML</dt>
-    <dd>Time series forecasting (ARIMA, EMD, seasonal-trend decomposition), sensitivity analysis, k-means clustering, PCA, CNNs</dd>
-    <dt>Applied math</dt>
-    <dd>Numerical ODEs, eigenspectral methods, Lyapunov exponents, dynamic mode decomposition, large-scale simulation</dd>
+<section class="block" aria-labelledby="exp-h">
+  <h2 id="exp-h">Professional experience</h2>
+  <dl class="cv">
+    <dt>Jun – Aug 2022</dt>
+    <dd><strong>Data Science Intern, iRhythm Technologies</strong>
+      <ul>
+        <li>Implemented time-series forecasting approaches (ARIMA, CNNs) and decomposition-based methods (empirical mode and seasonal-trend decomposition) to analyze product demand data.</li>
+        <li>Compared forecasting approaches across multiple error metrics and applied k-means clustering and principal component analysis (PCA) to investigate patterns in demand data.</li>
+      </ul>
+    </dd>
+    <dt>2019 – 2021</dt>
+    <dd><strong>Year-Round R&amp;D Intern, Sandia National Laboratories</strong>
+      <ul>
+        <li>Consolidated and cleaned environmental, safety, and security incident data, reconciling records across multiple sources and formats.</li>
+        <li>Built Excel visualizations and maintained a dashboard of safety, security, quality, and environmental metrics for laboratory leadership.</li>
+        <li>Earned Lean Six Sigma Green Belt certification; held a U.S. Department of Energy Q clearance.</li>
+      </ul>
+    </dd>
   </dl>
 </section>
 
 <section class="block" aria-labelledby="teach-h">
   <h2 id="teach-h">Teaching</h2>
   <dl class="cv">
+    <dt>2026</dt>
+    <dd><strong>Private Tutor</strong><span>Calculus, Ordinary Differential Equations, Matrix Algebra</span></dd>
     <dt>2021 – 2022</dt>
     <dd><strong>Peer Learning Facilitator, University of New Mexico</strong><span>Advanced Data Analysis I and II (STAT 427/527, 428/528)</span></dd>
+  </dl>
+</section>
+
+<section class="block" aria-labelledby="skills-h">
+  <h2 id="skills-h">Technical skills</h2>
+  <dl class="kit">
+    <dt>Programming</dt>
+    <dd>Python (NumPy, SciPy, PyTorch, Pandas, Matplotlib), R, MATLAB, Git, LaTeX, HPC/SLURM</dd>
+    <dt>Statistics and modeling</dt>
+    <dd>Time-series forecasting, regression modeling, global sensitivity analysis, clustering, PCA</dd>
+    <dt>Numerical methods</dt>
+    <dd>Numerical ODE integration, eigenspectral methods, numerical linear algebra, Lyapunov exponents, Dynamic Mode Decomposition, large-scale simulation</dd>
   </dl>
 </section>
 

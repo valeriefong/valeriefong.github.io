@@ -14,7 +14,7 @@ Personal site of Valerie Fong. Plain HTML, CSS and JavaScript, with no build ste
 | Static research figures | `assets/figures/`. Keep the same file names, or update the `src` in `research.html`. |
 | Headshot | `assets/headshot-440.webp` and `assets/headshot-800.webp` |
 | Link-preview card | `assets/og-card.png` (1200 × 630) |
-| Resume PDF | Edit `resume/resume.html`, then rebuild (below). |
+| Resume PDF | Edit `resume/resume.tex` (LaTeX), then rebuild (below). |
 
 ## Editing text
 
@@ -26,4 +26,4 @@ Open any `.html` file in a browser. Everything works locally except the live fig
 
 ## Rebuilding the resume PDF
 
-`python resume/build_pdf.py` (needs `pip install playwright` and `playwright install chromium`). Without Python, open `resume/resume.html` in Chrome, Print, Save as PDF with default margins and headers and footers off, and save over `files/Valerie_Fong_Resume.pdf`. Keep it to one page. The CV page (`cv.html`) is separate, so update both.
+The source is `resume/resume.tex`. Compile it with pdfLaTeX, either on Overleaf (upload the file, then download the PDF) or locally with `pdflatex resume.tex` from the `resume` folder. Save the PDF over `files/Valerie_Fong_Resume.pdf` so the site links keep working. Keep it to one page. The CV page (`cv.html`) is separate, so update both.
