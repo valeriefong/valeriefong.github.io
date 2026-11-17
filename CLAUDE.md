@@ -6,6 +6,7 @@ Valerie's personal site. Read README.md for the file layout.
 - Don't add attribution lines to commits or PRs (see `.claude/settings.json`). Commit as Valerie Fong <valmarie222@gmail.com>.
 - Commit straight to `master`. Don't create extra branches unless she asks for one.
 - Visual system: Spectral throughout (Greek and math symbols from a small Libertinus subset, "Greek Math"), italics only for math variables, colors as CSS variables in `assets/site.css`. Light only, no dark mode: figures keep their own colors. Keep it quiet and typographic.
+- After changing `assets/site.css` or `assets/js/viz.js`, bump the `?v=` on their links in every page (any new value, e.g. the short commit hash) so browsers don't keep the cached old file.
 - Live figures in `assets/js/viz.js` must be numerically honest. Captions say exactly what is computed, and nothing claims a result she doesn't have yet. Her own figures are working drafts.
 - Ongoing goal: replace the generic demos on the Research page with ones driven by her own code (the `rnn-lyapunov` repo, which is private), e.g. random vs dynamically critical connectivity.
 - Resume source: `resume/resume.tex` (LaTeX, compiled with pdfLaTeX; she edits it in Overleaf) produces `files/Valerie_Fong_Resume.pdf` (one page). `cv.html` is the long form, so keep the two consistent.
