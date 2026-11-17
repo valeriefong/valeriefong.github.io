@@ -1,10 +1,10 @@
 /* Layout: one reading column (40rem) for prose, a wider stage (60rem) for figures and live visuals.
-   Type: STIX Two Text throughout; italics only for mathematical variables. */
-@font-face{font-family:"STIX Two Text";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/stix-two-text-latin-400-normal.woff2) format("woff2")}
-@font-face{font-family:"STIX Two Text";font-style:italic;font-weight:400;font-display:swap;src:url(fonts/stix-two-text-latin-400-italic.woff2) format("woff2")}
-@font-face{font-family:"STIX Two Text";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/stix-two-text-latin-500-normal.woff2) format("woff2")}
-@font-face{font-family:"STIX Two Text";font-style:italic;font-weight:500;font-display:swap;src:url(fonts/stix-two-text-latin-500-italic.woff2) format("woff2")}
-@font-face{font-family:"STIX Two Text";font-style:normal;font-weight:600;font-display:swap;src:url(fonts/stix-two-text-latin-600-normal.woff2) format("woff2")}
+   Type: Libertinus Serif throughout (SIL Open Font License, assets/fonts/LIBERTINUS-OFL.txt);
+   italics only for mathematical variables. Figures sit directly on the page, with no plate. */
+@font-face{font-family:"Libertinus Serif";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/libertinus-serif-regular.woff2) format("woff2")}
+@font-face{font-family:"Libertinus Serif";font-style:italic;font-weight:400;font-display:swap;src:url(fonts/libertinus-serif-italic.woff2) format("woff2")}
+@font-face{font-family:"Libertinus Serif";font-style:normal;font-weight:600;font-display:swap;src:url(fonts/libertinus-serif-semibold.woff2) format("woff2")}
+@font-face{font-family:"Libertinus Serif";font-style:italic;font-weight:600;font-display:swap;src:url(fonts/libertinus-serif-semibolditalic.woff2) format("woff2")}
 
 :root{
   --paper:#f5f6f8;
@@ -36,9 +36,9 @@
 html{-webkit-text-size-adjust:100%}
 body{
   margin:0;background:var(--paper);color:var(--ink);
-  font-family:"STIX Two Text",Georgia,serif;
-  font-size:1.1875rem;line-height:1.6;
-  font-feature-settings:"kern","liga","onum";
+  font-family:"Libertinus Serif",Georgia,serif;
+  font-size:1.25rem;line-height:1.55;
+  font-feature-settings:"kern","liga","lnum";
   -webkit-font-smoothing:antialiased;
 }
 .wrap{max-width:40rem;margin-inline:auto;padding-inline:16px}
@@ -52,15 +52,15 @@ h1,h2,h3{text-wrap:balance}
 
 /* ---------- navigation ---------- */
 .topnav{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;padding-block:1.25rem .5rem}
-.topnav .home{font-weight:500;text-decoration:none;font-size:1.1rem}
+.topnav .home{font-weight:600;text-decoration:none;font-size:1.1rem}
 .topnav ul{display:flex;gap:1.4rem;list-style:none;margin:0;padding:0;font-size:1.05rem}
 .topnav ul a{text-decoration:none}
 .topnav ul a[aria-current="page"]{text-decoration:underline;text-decoration-thickness:2px;text-decoration-color:var(--ordered)}
 .topnav ul a:hover{text-decoration:underline}
 
 /* ---------- headings ---------- */
-h1{font-weight:500;font-size:clamp(2.6rem,7vw,3.75rem);line-height:1.04;letter-spacing:-.012em;margin:0 0 1.5rem}
-h2{font-weight:500;font-size:1.75rem;line-height:1.2;margin:0 0 1rem;letter-spacing:-.005em}
+h1{font-weight:400;font-size:clamp(2.6rem,7vw,3.75rem);line-height:1.04;letter-spacing:-.012em;margin:0 0 1.5rem}
+h2{font-weight:400;font-size:1.75rem;line-height:1.2;margin:0 0 1rem;letter-spacing:-.005em}
 h3{font-weight:600;font-size:1.15rem;line-height:1.35;margin:0 0 .4rem}
 p{margin:0 0 1rem}
 
@@ -72,13 +72,13 @@ header.intro{padding-top:3.5rem;padding-bottom:1.5rem}
 .intro p{max-width:36rem}
 .lead{font-size:1.3rem;line-height:1.5}
 .contact{display:flex;flex-wrap:wrap;gap:.4rem 1.6rem;margin-top:1.5rem;font-size:1.05rem}
-.contact a{font-weight:500}
+.contact a{font-weight:600}
 
 section.block{padding-block:2.5rem 1rem}
 .section-intro{max-width:40rem}
 
 /* ---------- live figures ---------- */
-.panel{background:var(--field);border:1px solid var(--rule);border-radius:3px;position:relative;min-width:0}
+.panel{position:relative;min-width:0}
 .panel canvas{display:block;width:100%;height:100%}
 .tag{position:absolute;left:.7rem;top:.45rem;font-size:.85rem;color:var(--muted);pointer-events:none}
 .controls{display:flex;align-items:center;flex-wrap:wrap;gap:.6rem 1.25rem;margin:.9rem 0 .3rem}
@@ -123,9 +123,17 @@ dl.kit dd{margin:0;color:var(--ink)}
 .seq-panels .plot{min-height:16rem}
 .ly-panels{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:.9rem}
 .ly-panels .panel{min-height:16rem}
+.qr-panels{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:.9rem}
+.qr-panels .panel{height:22rem}
 figure.still{margin-block:1.5rem 2rem}
 figure.still a{display:block}
-figure.still img{display:block;width:100%;max-width:100%;height:auto;border:1px solid var(--rule);border-radius:3px;background:var(--plate);padding:.6rem}
+/* Still figures are drawn on white or on nothing. Multiply lets the page show through the white;
+   in the dark theme the figure is inverted (hues kept) and screened onto the page instead. */
+figure.still img{display:block;width:100%;max-width:100%;height:auto;mix-blend-mode:multiply}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]) figure.still img{filter:invert(1) hue-rotate(180deg);mix-blend-mode:screen}
+}
+:root[data-theme="dark"] figure.still img{filter:invert(1) hue-rotate(180deg);mix-blend-mode:screen}
 figure.still.narrow{max-width:46rem;margin-inline:auto}
 section.block>figure.still.narrow{margin-inline:0}
 .project ul{margin:0 0 1rem;padding-left:1.2rem}
@@ -158,13 +166,14 @@ details.partner[open] summary{color:var(--ink)}
 details.partner p{margin:.7rem 0 0;color:var(--ink)}
 
 @media (max-width:760px){
-  body{font-size:1.0625rem}
+  body{font-size:1.15rem}
   .lead{font-size:1.16rem}
   header.intro{padding-top:2rem}
   .intro-grid{grid-template-columns:1fr;gap:0}
   .intro-grid .portrait{order:-1;margin:1.5rem 0 0;width:9.5rem}
   .preview{grid-template-columns:1fr}
-  .gain-panels,.seq-panels,.ly-panels{grid-template-columns:1fr}
+  .gain-panels,.seq-panels,.ly-panels,.qr-panels{grid-template-columns:1fr}
+  .qr-panels .panel{height:19rem}
   .gain-panels .spec,.seq-panels .traj{max-width:21rem;width:100%;justify-self:center}
   dl.cv,dl.kit{grid-template-columns:1fr;gap:.2rem}
   dl.cv dd,dl.kit dd{margin-bottom:1rem}

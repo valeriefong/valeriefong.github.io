@@ -6,8 +6,8 @@
 function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 const gauss = r => { let u=0; while(u===0) u=r(); const v=r(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); };
 const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
-const FONT = '13px "STIX Two Text", Georgia, serif';
-const FONT_I = 'italic 13px "STIX Two Text", Georgia, serif';
+const FONT = '15px "Libertinus Serif", Georgia, serif';
+const FONT_I = 'italic 15px "Libertinus Serif", Georgia, serif';
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const $ = id => document.getElementById(id);
 
@@ -442,6 +442,178 @@ function loop(el, frame){
   describe(); drawSpec(); drawConv(); onRedraw(() => { drawSpec(); drawConv(); });
   // expose for verification in tests
   window.__lyap = { setG: v => { g = v; reset(); }, run, est, get t(){ return t; }, W, N };
+})();
+
+// ======================================================================
+// 6. The QR (Benettin) algorithm, shown for the two largest exponents
+//    Same model and matrix as section 5: dx/dt = -x + g W tanh(x), N = 80, Euler steps of 0.05.
+//    Two tangent vectors evolve by dv/dt = J v for one time constant (SUB steps), then are
+//    orthonormalized. With [v1 v2] = QR, the columns of R are the vectors' coordinates in the
+//    orthonormal frame Q, so drawing (R11, 0) and (R12, R22) shows their lengths and angle exactly.
+// ======================================================================
+(function qrDemo(){
+  const fc = $('qr-frame'), rc = $('qr-run'); if (!fc) return;
+  const slider = $('qr-g'), gout = $('qr-gout'), playB = $('qr-play'), nextB = $('qr-next'), fastB = $('qr-fast'), readout = $('qr-readout');
+  const N = 80, DT = 0.05, SUB = 20, T_TRANS = 40;
+  const TITLES = ['Evolve for one time constant', 'Make the second perpendicular', 'Record the log of each length', 'Rescale both to length one'];
+  const DUR = [1700, 1200, 1300, 900];
+  const rng = mulberry32(1);
+  const W = new Float64Array(N*N); const s = 1/Math.sqrt(N);
+  for (let i=0;i<N*N;i++) W[i] = gauss(rng)*s;
+  const x = new Float64Array(N), th = new Float64Array(N), Dg = new Float64Array(N), dx = new Float64Array(N);
+  const v1 = new Float64Array(N), v2 = new Float64Array(N), d1 = new Float64Array(N), d2 = new Float64Array(N);
+  let g = parseFloat(slider.value), S1 = 0, S2 = 0, T = 0, count = 0, hist = [], shapes = [[1,0,1]], R = [1,0,1];
+  let phase = 0, u = 0, paused = false, fast = false, prev = 0, unit = 0, ox = 0;
+
+  function step(tangent){
+    for (let i=0;i<N;i++){ th[i] = Math.tanh(x[i]); Dg[i] = 1 - th[i]*th[i]; }
+    for (let i=0;i<N;i++){
+      let acc = 0, a1 = 0, a2 = 0; const o = i*N;
+      for (let j=0;j<N;j++){ const w = W[o+j]; acc += w*th[j]; if (tangent){ const wd = w*Dg[j]; a1 += wd*v1[j]; a2 += wd*v2[j]; } }
+      dx[i] = -x[i] + g*acc; d1[i] = -v1[i] + g*a1; d2[i] = -v2[i] + g*a2;
+    }
+    for (let i=0;i<N;i++){ x[i] += DT*dx[i]; if (tangent){ v1[i] += DT*d1[i]; v2[i] += DT*d2[i]; } }
+  }
+  function rOf(){
+    let n1 = 0, dot = 0, n2 = 0;
+    for (let i=0;i<N;i++){ n1 += v1[i]*v1[i]; dot += v1[i]*v2[i]; n2 += v2[i]*v2[i]; }
+    const r11 = Math.sqrt(n1), r12 = dot/r11;
+    return [r11, r12, Math.sqrt(Math.max(0, n2 - r12*r12))];
+  }
+  function orthonormalize(r){
+    for (let i=0;i<N;i++){ v1[i] /= r[0]; v2[i] = (v2[i] - r[1]*v1[i])/r[2]; }
+  }
+  function interval(){
+    shapes = [[1,0,1]];
+    for (let k=0;k<SUB;k++){ step(true); shapes.push(rOf()); }
+    R = shapes[SUB]; orthonormalize(R);
+    S1 += Math.log(R[0]); S2 += Math.log(R[2]); T += SUB*DT; count++;
+    hist.push([T, S1/T, S2/T]); if (hist.length > 3000) hist.shift();
+  }
+  function reset(){
+    const kr = mulberry32(99);
+    for (let i=0;i<N;i++){ x[i] = gauss(kr); v1[i] = gauss(kr); v2[i] = gauss(kr); }
+    for (let k=0;k<Math.round(T_TRANS/DT);k++) step(false);
+    orthonormalize(rOf());
+    S1 = 0; S2 = 0; T = 0; count = 0; hist = []; phase = 0; u = 0; unit = 0;
+    interval();
+  }
+
+  const ease = t => t*t*(3 - 2*t);
+  function shape(){
+    if (phase === 0){ const f = u*SUB, k = Math.min(SUB-1, Math.floor(f)), t = f - k, A = shapes[k], B = shapes[k+1]; return [A[0]+(B[0]-A[0])*t, A[1]+(B[1]-A[1])*t, A[2]+(B[2]-A[2])*t]; }
+    if (phase === 1) return [R[0], R[1]*(1 - ease(u)), R[2]];
+    if (phase === 2) return [R[0], 0, R[2]];
+    const e = ease(u); return [Math.pow(R[0], 1-e), 0, Math.pow(R[2], 1-e)];
+  }
+  const fmt = v => (v < 0 ? '−' : '+') + Math.abs(v).toFixed(2);
+  function arrow(ctx, x0, y0, x1, y1, color){
+    const a = Math.atan2(y1-y0, x1-x0), L = Math.hypot(x1-x0, y1-y0), hd = Math.min(11, L*0.4);
+    ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 2.4; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x1 - Math.cos(a)*hd*0.8, y1 - Math.sin(a)*hd*0.8); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x1 - hd*Math.cos(a-0.42), y1 - hd*Math.sin(a-0.42)); ctx.lineTo(x1 - hd*Math.cos(a+0.42), y1 - hd*Math.sin(a+0.42)); ctx.closePath(); ctx.fill();
+  }
+  function drawFrame(){
+    const [ctx,w,h] = fit(fc);
+    const ink = css('--ink'), muted = css('--muted'), rule = css('--rule'), c1 = css('--ordered'), c2 = css('--c3');
+    ctx.clearRect(0,0,w,h);
+    // the four steps, current one in ink
+    ctx.font = FONT;
+    for (let k=0;k<4;k++){ ctx.fillStyle = k === phase ? ink : muted; ctx.globalAlpha = k === phase ? 1 : 0.65; ctx.fillText(`${k+1}. ${TITLES[k]}`, 8, 18 + 19*k); }
+    ctx.globalAlpha = 1;
+    // scale: fit this interval's largest extent, eased so the picture does not jump
+    let xmin = 0, xmax = 1, ymax = 1;
+    for (const q of shapes){ xmin = Math.min(xmin, q[1]); xmax = Math.max(xmax, q[0], q[1], q[0]+q[1]); ymax = Math.max(ymax, q[2]); }
+    const top = 104, bot = 34, padX = 30;
+    const target = Math.min((w - 2*padX)/(xmax - xmin), (h - top - bot)/ymax, Math.min(w,h)*0.5);
+    const oxT = (w - (xmax - xmin)*target)/2 - xmin*target;
+    if (!unit){ unit = target; ox = oxT; } else { unit += (target - unit)*0.12; ox += (oxT - ox)*0.12; }
+    const oy = h - bot, X = v => ox + v*unit, Y = v => oy - v*unit;
+    const [a,b,c] = shape();
+    // unit square the vectors start from
+    ctx.strokeStyle = muted; ctx.globalAlpha = 0.6; ctx.lineWidth = 1; ctx.setLineDash([3,4]);
+    ctx.strokeRect(X(0), Y(1), unit, unit); ctx.setLineDash([]); ctx.globalAlpha = 1;
+    // area spanned by the two vectors
+    ctx.fillStyle = withAlpha(c1, 0.11);
+    ctx.beginPath(); ctx.moveTo(X(0),Y(0)); ctx.lineTo(X(a),Y(0)); ctx.lineTo(X(a+b),Y(c)); ctx.lineTo(X(b),Y(c)); ctx.closePath(); ctx.fill();
+    if (phase === 1){   // the part of the second vector along the first, being removed
+      ctx.strokeStyle = c2; ctx.globalAlpha = 0.55; ctx.setLineDash([4,4]); ctx.lineWidth = 1.4;
+      ctx.beginPath(); ctx.moveTo(X(R[1]),Y(c)); ctx.lineTo(X(b),Y(c)); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
+    }
+    if (phase >= 1 && Math.abs(b) < 0.02){   // right-angle mark
+      const m = 9; ctx.strokeStyle = muted; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(X(0)+m,Y(0)); ctx.lineTo(X(0)+m,Y(0)-m); ctx.lineTo(X(0),Y(0)-m); ctx.stroke();
+    }
+    arrow(ctx, X(0), Y(0), X(a), Y(0), c1);
+    arrow(ctx, X(0), Y(0), X(b), Y(c), c2);
+    // lengths
+    const len2 = Math.hypot(b,c);
+    ctx.font = FONT; ctx.textAlign = 'center'; ctx.fillStyle = c1;
+    ctx.fillText(phase === 2 ? `length ${a.toFixed(2)},  log ${fmt(Math.log(a))}` : `length ${a.toFixed(2)}`, X(a/2), Y(0)+20);
+    ctx.fillStyle = c2; ctx.textAlign = b < 0 ? 'right' : 'left';
+    const lx = X(b) + (b < 0 ? -8 : 8), ly = Math.max(top - 6, Y(c) - 8);
+    ctx.fillText(phase === 2 ? `length ${len2.toFixed(2)},  log ${fmt(Math.log(len2))}` : `length ${len2.toFixed(2)}`, lx, ly);
+    ctx.textAlign = 'left';
+  }
+  function sub(ctx, base, idx, xx, yy){   // "λ" with a subscript, then the rest of the label
+    ctx.fillText(base, xx, yy); const wb = ctx.measureText(base).width;
+    ctx.save(); ctx.font = FONT.replace(/\d+px/, '10px'); ctx.fillText(idx, xx + wb, yy + 4); const wi = ctx.measureText(idx).width; ctx.restore();
+    return xx + wb + wi;
+  }
+  function drawRun(){
+    const [ctx,w,h] = fit(rc);
+    const ink = css('--ink'), muted = css('--muted'), rule = css('--rule'), c1 = css('--ordered'), c2 = css('--c3');
+    ctx.clearRect(0,0,w,h);
+    ctx.fillStyle = muted; ctx.font = FONT; ctx.fillText('Running averages of the logs, per time constant', 8, 18);
+    const n = phase >= 2 ? hist.length : hist.length - 1;
+    const L = 40, Rr = w - 86, top = 44, bot = h - 34;
+    const tmax = Math.max(20, n ? hist[n-1][0] : 0);
+    let lo = -0.2, hi = 0.2;
+    for (let i=Math.min(4, Math.max(0,n-1)); i<n; i++){ lo = Math.min(lo, hist[i][1], hist[i][2]); hi = Math.max(hi, hist[i][1], hist[i][2]); }
+    const pad = (hi - lo)*0.12; lo -= pad; hi += pad;
+    const X = t => L + (Rr - L)*t/tmax, Y = v => top + (hi - Math.max(lo, Math.min(hi, v)))/(hi - lo)*(bot - top);
+    ctx.strokeStyle = rule; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(L, Y(0)); ctx.lineTo(Rr, Y(0)); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(L, top); ctx.lineTo(L, bot); ctx.stroke();
+    ctx.fillStyle = muted; ctx.textAlign = 'right'; ctx.fillText('0', L - 6, Y(0) + 4);
+    const tick = hi > 0.6 ? 0.5 : 0.2; for (const v of [tick, -tick]) if (v < hi && v > lo) ctx.fillText(v.toFixed(1).replace('-','−'), L - 6, Y(v) + 4);
+    ctx.textAlign = 'left'; ctx.fillText(`time: ${Math.round(tmax)} time constants`, L, h - 10);
+    if (n < 1) return;
+    [[1, c1, '1'], [2, c2, '2']].forEach(([col, color, idx]) => {
+      ctx.strokeStyle = color; ctx.lineWidth = 1.8; ctx.lineJoin = 'round'; ctx.beginPath();
+      for (let i=0;i<n;i++){ const xx = X(hist[i][0]), yy = Y(hist[i][col]); i ? ctx.lineTo(xx,yy) : ctx.moveTo(xx,yy); }
+      ctx.stroke();
+      const v = hist[n-1][col]; let yy = Y(v) + 4;
+      if (col === 2 && Math.abs(Y(v) - Y(hist[n-1][1])) < 16) yy = Y(hist[n-1][1]) + 4 + 16;
+      ctx.fillStyle = color; ctx.beginPath(); ctx.arc(X(hist[n-1][0]), Y(v), 3, 0, 2*Math.PI); ctx.fill();
+      const xe = sub(ctx, 'λ', idx, X(hist[n-1][0]) + 8, yy); ctx.fillText(` ≈ ${v.toFixed(2).replace('-','−')}`, xe, yy);
+    });
+  }
+  function describe(){
+    gout.textContent = g.toFixed(1);
+    if (phase < 2 && count <= 1){ readout.textContent = 'Each pass through the four steps adds one pair of logarithms to the running totals.'; return; }
+    const n = phase >= 2 ? hist.length : hist.length - 1; if (n < 1) return;
+    const [t, l1, l2] = hist[n-1];
+    const state = l1 > 0.02 ? 'The first is positive: nearby states separate, and the network is chaotic.' : (l1 > -0.02 ? 'The first is close to zero.' : 'Both are negative: perturbations die away.');
+    readout.innerHTML = `After ${Math.round(t)} time constant${Math.round(t) === 1 ? '' : 's'} the averages are ${l1.toFixed(2).replace('-','−')} and ${l2.toFixed(2).replace('-','−')}. ${count < 30 ? 'They are still settling.' : state}`;
+  }
+  function draw(){ drawFrame(); drawRun(); }
+  function advancePhase(){ phase++; u = 0; if (phase === 4){ phase = 0; interval(); } if (phase === 2 || phase === 0) describe(); }
+  function frame(ts){
+    const dt = Math.min(60, ts - (prev || ts)); prev = ts;
+    if (paused){ return; }
+    let left = dt*(fast ? 14 : 1);
+    while (left > 0){ const need = (1 - u)*DUR[phase]; if (left >= need){ left -= need; advancePhase(); } else { u += left/DUR[phase]; left = 0; } }
+    draw();
+  }
+  playB.addEventListener('click', () => { paused = !paused; playB.textContent = paused ? 'Play' : 'Pause'; });
+  nextB.addEventListener('click', () => { paused = true; playB.textContent = 'Play'; if (u >= 1) advancePhase(); u = 1; if (phase === 2) describe(); unit = 0; draw(); });
+  fastB.addEventListener('click', () => { fast = !fast; fastB.setAttribute('aria-pressed', String(fast)); });
+  slider.addEventListener('input', () => { g = parseFloat(slider.value); gout.textContent = g.toFixed(1); });
+  slider.addEventListener('change', () => { reset(); describe(); draw(); });
+  loop($('qr-demo'), frame);
+  reset();
+  if (reduce){ for (let k=0;k<200;k++) interval(); phase = 2; u = 1; paused = true; playB.hidden = true; fastB.hidden = true; }
+  describe(); draw(); onRedraw(() => { unit = 0; draw(); });
+  window.__qr = { get hist(){ return hist; }, get R(){ return R; }, run: n => { for (let k=0;k<n;k++) interval(); } };
 })();
 
 })();
