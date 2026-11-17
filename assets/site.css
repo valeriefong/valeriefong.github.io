@@ -1,43 +1,35 @@
 /* Layout: one reading column (40rem) for prose, a wider stage (60rem) for figures and live visuals.
-   Type: Libertinus Serif throughout (SIL Open Font License, assets/fonts/LIBERTINUS-OFL.txt);
-   italics only for mathematical variables. Figures sit directly on the page, with no plate. */
-@font-face{font-family:"Libertinus Serif";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/libertinus-serif-regular.woff2) format("woff2")}
-@font-face{font-family:"Libertinus Serif";font-style:italic;font-weight:400;font-display:swap;src:url(fonts/libertinus-serif-italic.woff2) format("woff2")}
-@font-face{font-family:"Libertinus Serif";font-style:normal;font-weight:600;font-display:swap;src:url(fonts/libertinus-serif-semibold.woff2) format("woff2")}
-@font-face{font-family:"Libertinus Serif";font-style:italic;font-weight:600;font-display:swap;src:url(fonts/libertinus-serif-semibolditalic.woff2) format("woff2")}
+   Type: Spectral (SIL Open Font License, assets/fonts/SPECTRAL-OFL.txt). Spectral has no Greek or
+   math symbols, so "Greek Math" fills only those characters (a Libertinus Serif subset; the browser
+   downloads it only on pages that use them). Italics only for mathematical variables.
+   Light only: figures sit directly on the page and keep their own colors. */
+@font-face{font-family:"Spectral";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/spectral-400-normal.woff2) format("woff2")}
+@font-face{font-family:"Spectral";font-style:italic;font-weight:400;font-display:swap;src:url(fonts/spectral-400-italic.woff2) format("woff2")}
+@font-face{font-family:"Spectral";font-style:normal;font-weight:600;font-display:swap;src:url(fonts/spectral-600-normal.woff2) format("woff2")}
+@font-face{font-family:"Spectral";font-style:italic;font-weight:600;font-display:swap;src:url(fonts/spectral-600-italic.woff2) format("woff2")}
+@font-face{font-family:"Greek Math";font-style:normal;font-display:swap;src:url(fonts/greek-math-regular.woff2) format("woff2");unicode-range:U+0370-03FF,U+2032-2033,U+2070-209F,U+2202,U+2206,U+2211,U+2219,U+221A,U+221E,U+2248,U+2260,U+2264-2265}
+@font-face{font-family:"Greek Math";font-style:italic;font-display:swap;src:url(fonts/greek-math-italic.woff2) format("woff2");unicode-range:U+0370-03FF,U+2032-2033,U+2070-209F,U+2202,U+2206,U+2211,U+2219,U+221A,U+221E,U+2248,U+2260,U+2264-2265}
 
 :root{
-  --paper:#f5f6f8;
-  --ink:#18203a;
-  --muted:#5a6377;
-  --rule:#d6dae2;
-  --ordered:#2a47a0;
-  --chaotic:#b0306a;
+  --paper:#f7f6f2;
+  --ink:#1b2133;
+  --muted:#5b6274;
+  --rule:#d9d8d2;
+  --ordered:#0047ab;
+  --chaotic:#c41e3a;
   --c3:#1d7466;
   --c4:#9a6312;
   --field:#ffffff;
   --plate:#ffffff;
   color-scheme:light;
 }
-@media (prefers-color-scheme:dark){
-  :root:not([data-theme="light"]){
-    --paper:#121a2b;--ink:#e3e7ef;--muted:#9aa3b6;--rule:#2b3550;
-    --ordered:#8fa8ff;--chaotic:#f07aae;--c3:#5cc9b5;--c4:#e2b25c;
-    --field:#172036;--plate:#ffffff;color-scheme:dark;
-  }
-}
-:root[data-theme="dark"]{
-  --paper:#121a2b;--ink:#e3e7ef;--muted:#9aa3b6;--rule:#2b3550;
-  --ordered:#8fa8ff;--chaotic:#f07aae;--c3:#5cc9b5;--c4:#e2b25c;
-  --field:#172036;--plate:#ffffff;color-scheme:dark;
-}
 
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{
   margin:0;background:var(--paper);color:var(--ink);
-  font-family:"Libertinus Serif",Georgia,serif;
-  font-size:1.25rem;line-height:1.55;
+  font-family:"Spectral","Greek Math",Georgia,serif;
+  font-size:1.2rem;line-height:1.6;
   font-feature-settings:"kern","liga","lnum";
   -webkit-font-smoothing:antialiased;
 }
@@ -127,13 +119,8 @@ dl.kit dd{margin:0;color:var(--ink)}
 .qr-panels .panel{height:22rem}
 figure.still{margin-block:1.5rem 2rem}
 figure.still a{display:block}
-/* Still figures are drawn on white or on nothing. Multiply lets the page show through the white;
-   in the dark theme the figure is inverted (hues kept) and screened onto the page instead. */
+/* Still figures are drawn on white or on nothing; multiply lets the page show through the white. */
 figure.still img{display:block;width:100%;max-width:100%;height:auto;mix-blend-mode:multiply}
-@media (prefers-color-scheme:dark){
-  :root:not([data-theme="light"]) figure.still img{filter:invert(1) hue-rotate(180deg);mix-blend-mode:screen}
-}
-:root[data-theme="dark"] figure.still img{filter:invert(1) hue-rotate(180deg);mix-blend-mode:screen}
 figure.still.narrow{max-width:46rem;margin-inline:auto}
 section.block>figure.still.narrow{margin-inline:0}
 .project ul{margin:0 0 1rem;padding-left:1.2rem}

@@ -6,8 +6,8 @@
 function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 const gauss = r => { let u=0; while(u===0) u=r(); const v=r(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); };
 const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
-const FONT = '15px "Libertinus Serif", Georgia, serif';
-const FONT_I = 'italic 15px "Libertinus Serif", Georgia, serif';
+const FONT = '15px "Spectral", "Greek Math", Georgia, serif';
+const FONT_I = 'italic 15px "Spectral", "Greek Math", Georgia, serif';
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const $ = id => document.getElementById(id);
 
@@ -20,13 +20,11 @@ function hex(h){ h=h.replace('#',''); return [0,2,4].map(i=>parseInt(h.slice(i,i
 function mix(a,b,t){ const A=hex(a),B=hex(b); return `rgb(${A.map((v,i)=>Math.round(v+(B[i]-v)*t)).join(',')})`; }
 function withAlpha(h,a){ const [r,g,b]=hex(h); return `rgba(${r},${g},${b},${a})`; }
 
-// Redraw hooks for theme changes and resizes
+// Redraw hooks for resizes and font loading
 const redraws = [];
 function onRedraw(fn){ redraws.push(fn); }
 let rz = 0;
 addEventListener('resize', () => { cancelAnimationFrame(rz); rz = requestAnimationFrame(() => redraws.forEach(f=>f())); });
-matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => redraws.forEach(f=>f()));
-new MutationObserver(() => redraws.forEach(f=>f())).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
 if (document.fonts) document.fonts.ready.then(() => redraws.forEach(f=>f()));
 
 // Animation loop that only runs while its element is visible and the tab is shown

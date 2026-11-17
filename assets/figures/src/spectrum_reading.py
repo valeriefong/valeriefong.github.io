@@ -13,9 +13,9 @@ The spectrum is kept next to this script (spectrum_random_N1000_g5_seed0.csv, wr
 --extract from ~/lyapunov_data/fresh_prod/snapshots/2026-11-15_final/rows.csv.gz), so the
 figure can be rebuilt without the snapshot.
 Output: assets/figures/spectrum-reading.svg (transparent, so it sits directly on the page).
-Needs numpy and matplotlib (pandas only for --extract). Type: Libertinus Serif, the site's
-typeface, if it is installed or its .otf files are in the folder named by LIBERTINUS_DIR;
-otherwise STIX, with a warning.
+Needs numpy and matplotlib (pandas only for --extract). Type: Spectral, the site's typeface,
+if it is installed or its .ttf/.otf files are in the folder named by FIGURE_FONT_DIR (Greek
+and math symbols come from STIX); otherwise STIX throughout, with a warning.
 '''
 import os
 import sys
@@ -31,7 +31,7 @@ from matplotlib import font_manager
 HERE = os.path.dirname(os.path.abspath(__file__))
 SNAP = os.path.expanduser('~/lyapunov_data/fresh_prod/snapshots/2026-11-15_final/rows.csv.gz')
 MODEL, N, G, SEED = 'Random', 1000, 5.0, 0
-BLUE, INK, MUTED = '#0047AB', '#18203a', '#5a6377'     # Random blue from rnn-lyapunov style.py; site ink
+BLUE, INK, MUTED = '#0047AB', '#1b2133', '#5b6274'     # Random blue from rnn-lyapunov style.py; site ink
 
 
 CSV = os.path.join(HERE, f'spectrum_random_N{N}_g{G:g}_seed{SEED}.csv')
@@ -66,13 +66,14 @@ def load():
 
 
 def typeface():
-    for f in glob.glob(os.path.join(os.environ.get('LIBERTINUS_DIR', ''), 'LibertinusSerif-*.otf')):
+    d = os.environ.get('FIGURE_FONT_DIR', '')
+    for f in glob.glob(os.path.join(d, '*.ttf')) + glob.glob(os.path.join(d, '*.otf')):
         font_manager.fontManager.addfont(f)
-    if any(f.name == 'Libertinus Serif' for f in font_manager.fontManager.ttflist):
-        return {'font.family': 'Libertinus Serif', 'mathtext.fontset': 'custom',
-                'mathtext.rm': 'Libertinus Serif', 'mathtext.it': 'Libertinus Serif:italic',
-                'mathtext.bf': 'Libertinus Serif:bold', 'mathtext.fallback': 'stix'}
-    print('WARNING: Libertinus Serif not found; using STIX. The site figure uses Libertinus.')
+    if any(f.name == 'Spectral' for f in font_manager.fontManager.ttflist):
+        return {'font.family': 'Spectral', 'mathtext.fontset': 'custom',
+                'mathtext.rm': 'Spectral', 'mathtext.it': 'Spectral:italic',
+                'mathtext.bf': 'Spectral:bold', 'mathtext.fallback': 'stix'}
+    print('WARNING: Spectral not found; using STIX. The site figure uses Spectral.')
     return {'font.family': 'STIXGeneral', 'mathtext.fontset': 'stix'}
 
 
@@ -134,7 +135,7 @@ def main():
     top = S[:m].max() * 1.12
     c.set_ylim(top * lo / hi, top)
     c.plot([D], [0], 'o', color=INK, ms=6, zorder=5, clip_on=False)
-    c.annotate('sum returns\nto zero at ' rf'$D = {D:.1f}$', xy=(D, 0), xytext=(116, top * 0.42),
+    c.annotate('sum returns\nto zero at\n' rf'$D = {D:.1f}$', xy=(D, 0), xytext=(119, top * 0.2),
                ha='right', arrowprops=dict(arrowstyle='-', color=MUTED, lw=0.8))
     b.set_title('The first 120, with their running sum', loc='left', fontsize=14, pad=10)
 
