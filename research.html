@@ -41,6 +41,7 @@
   <div class="wrap">
     <h2 id="ly-h">Lyapunov spectra of three recurrent network models</h2>
     <p>The units of a recurrent network drive one another. When the coupling is weak, activity dies away. When it is strong enough, the network keeps itself active with no input, and two almost identical starting states drift apart. That sensitivity to the starting state is chaos.</p>
+    <p>The classic example is the random network of Sompolinsky, Crisanti and Sommers (1988), <i class="m">dx/dt</i> = −<i class="m">x</i> + <i class="m">gW</i> tanh(<i class="m">x</i>), with Gaussian connection weights of variance 1/<i class="m">N</i>. In large networks, activity decays to rest when the gain <i class="m">g</i> is below 1 and becomes chaotic above it. Panel A of the figure on the <a href="index.html#now">About page</a> shows one such network at three gains.</p>
   </div>
 
   <div class="wrap">
@@ -54,7 +55,7 @@
   </div>
   <figure class="still wide">
     <a href="assets/figures/spectrum-reading.svg"><img src="assets/figures/spectrum-reading.svg" width="1000" height="410" loading="lazy" alt="Left: 1000 Lyapunov exponents sorted from largest to smallest, falling from 0.41 to about −2.4, with the 37 positive ones shaded. Right: the first 120 exponents with their running sum, which rises to about 6.9 and returns to zero at index 79.3."></a>
-    <figcaption><b>Figure 1.</b> The Lyapunov spectrum of one random network, <i class="m">dx/dt</i> = −<i class="m">x</i> + <i class="m">gW</i> tanh(<i class="m">x</i>) with 1000 units at <i class="m">g</i> = 5 (the strongly chaotic network on the <a href="index.html#now">About page</a>), from one run of my dataset: integrated with fourth-order Runge–Kutta at a step of 0.01 time constants, with exponents averaged over about 1000 time constants after a transient. Left: all 1000 exponents, of which 37 are positive. Right: the first 120 and their running sum (dashed, right axis). The shaded area is <i class="m">H</i> = 6.9 per time constant. The running sum returns to zero at <i class="m">D</i> = 79.3, so by this estimate the activity occupies about 79 of the 1000 available dimensions.</figcaption>
+    <figcaption><b>Figure 1.</b> The Lyapunov spectrum of one random network, <i class="m">dx/dt</i> = −<i class="m">x</i> + <i class="m">gW</i> tanh(<i class="m">x</i>) with 1000 units at <i class="m">g</i> = 5 (the strongly chaotic network on the <a href="index.html#now">About page</a>, panel A), from one run of my dataset: integrated with fourth-order Runge–Kutta at a step of 0.01 time constants, with exponents averaged over about 1000 time constants after a transient. Left: all 1000 exponents, of which 37 are positive. Right: the first 120 and their running sum (dashed, right axis). The shaded area is <i class="m">H</i> = 6.9 per time constant. The running sum returns to zero at <i class="m">D</i> = 79.3, so by this estimate the activity occupies about 79 of the 1000 available dimensions.</figcaption>
   </figure>
   <div class="wrap">
     <h3 id="algorithm">How the exponents are computed</h3>
@@ -94,29 +95,29 @@
   </figure>
 
   <div class="wrap">
+    <h3 id="random">Chaos in the random network</h3>
+    <p>Figure 4 shows how the spectrum of the random network changes with gain and network size. It is the baseline every other model is read against, and it reproduces the published results of Engelken et al. (2023).</p>
+  </div>
+  <figure class="still wide">
+    <a href="assets/figures/random-baseline.webp"><img src="assets/figures/random-baseline.webp" width="2400" height="1100" loading="lazy" alt="Three panels for the random network. A: Lyapunov spectra for gains from 0 to 300, all falling from positive values at the left to about minus 4 at the right. B: entropy rate per unit and dimension per unit against gain, both rising quickly and then leveling off. C: entropy rate and dimension against network size at four gains, each a straight line."></a>
+    <figcaption><b>Figure 4.</b> The Random baseline. (A) Lyapunov spectra λ<sub><i class="m">i</i></sub> against <i class="m">i</i>/<i class="m">N</i> (mean of the sorted spectra over 20 networks) at <i class="m">N</i> = 1000 (lines) for <i class="m">g</i> = 0 to 300, and at <i class="m">N</i> = 200 (dots) for <i class="m">g</i> = 2, 10, 100, 300. The colour bar has one band per plotted gain; it is not a scale in <i class="m">g</i>. Colours in A index gain, not architecture. (B) Entropy rate per unit <i class="m">H</i>/<i class="m">N</i> (solid, left axis) and dimension per unit <i class="m">D</i>/<i class="m">N</i> (dashed, right axis) against <i class="m">g</i> at <i class="m">N</i> = 1000. (C) <i class="m">H</i> and <i class="m">D</i> against <i class="m">N</i> at <i class="m">g</i> = 5, 10, 20, 100, with least-squares lines through the means at <i class="m">N</i> = 200, 500, 1000 (<i class="m">R</i><sup>2</sup> ≥ 0.9997). Mean ± 1 SD across 20 networks. All exponents in units of 1/τ, <i class="m">H</i> in nats/τ. These results agree with Engelken et al. (2023), Fig. 21, within the precision of reading values from their figure.</figcaption>
+  </figure>
+
+  <div class="wrap">
     <h3 id="models">Three ways to build the network</h3>
-    <p>The project compares three models, each chaotic for a different structural reason:</p>
+    <p>The project compares three models, each chaotic for a different structural reason. Panel B of the figure on the <a href="index.html#now">About page</a> shows one network of each.</p>
     <ul>
       <li><b>Random.</b> The classical network of Sompolinsky, Crisanti and Sommers (1988), used as the baseline.</li>
       <li><b>Dynamically critical.</b> Random connectivity in which the 30% of eigenvalues with the largest real part are moved to a common real part just below one before the gain is applied, so a large group of modes reaches the stability boundary together.</li>
       <li><b>Barcode.</b> The model of Fang et al. (2025): random connectivity with net inhibition, and a leak on every unit that grows with the network’s total activity.</li>
     </ul>
   </div>
-  <figure class="still wide narrow">
-    <a href="assets/figures/three-models.webp"><img src="assets/figures/three-models.webp" width="2400" height="2200" loading="lazy" alt="Three columns labelled Random, Dynamically critical and Barcode. Top row: rings of eight units and their connections; the Dynamically critical ring has thick self-connections. Middle row: eigenvalues of each connectivity matrix; Random and Barcode fill a disc, while in Dynamically critical the right part of the disc is empty and those eigenvalues sit on a vertical line. Bottom row: irregular activity of five units in each network."></a>
-    <figcaption><b>Figure 4.</b> One 1000-unit network of each model at a gain where it is chaotic (Random and Dynamically critical at <i class="m">g</i> = 2, Barcode at <i class="m">g</i> = 7). Top: eight units and their connections, with self-connections as loops. Orange is excitatory, grey is inhibitory, and stronger connections are thicker and darker. Middle: eigenvalues of the connectivity matrix, in units of <i class="m">g</i>, with a circle of radius <i class="m">g</i>. In the Dynamically critical network the moved eigenvalues line up on the right. The Barcode matrix has one more eigenvalue far to the left, near its mean inhibition μ = −40. Bottom: activity of five units.</figcaption>
-  </figure>
-
 
   <div class="wrap">
     <h3 id="design">Study design and validation</h3>
     <p>I own this project end to end, from experimental design to analysis. I built a Python/PyTorch simulation pipeline with SLURM job arrays covering 1,060 parameter combinations for the three models (up to <i class="m">N</i> = 2,000), with 20 networks at each, generating about 22,000 runs over nearly 90,000 CPU core-hours.</p>
-    <p>I adapted and extended a published Lyapunov-spectrum solver (Engelken et al., 2023; QR/Benettin method, RK4 integration). I validated it against a reference implementation (Figure 5) and checked numerical convergence via paired comparisons of step size, reorthonormalization interval, duration, and precision.</p>
+    <p>I adapted and extended a published Lyapunov-spectrum solver (Engelken et al., 2023; QR/Benettin method, RK4 integration). I validated it against a reference implementation (Figure 4) and checked numerical convergence via paired comparisons of step size, reorthonormalization interval, duration, and precision.</p>
   </div>
-  <figure class="still wide">
-    <a href="assets/figures/random-baseline.webp"><img src="assets/figures/random-baseline.webp" width="2400" height="1100" loading="lazy" alt="Three panels for the random network. A: Lyapunov spectra for gains from 0 to 300, all falling from positive values at the left to about minus 4 at the right. B: entropy rate per unit and dimension per unit against gain, both rising quickly and then leveling off. C: entropy rate and dimension against network size at four gains, each a straight line."></a>
-    <figcaption><b>Figure 5.</b> The random baseline. (A) Lyapunov spectra λ<sub><i class="m">i</i></sub> against <i class="m">i</i>/<i class="m">N</i>, averaged over 20 networks, at <i class="m">N</i> = 1000 (lines) for <i class="m">g</i> from 0 to 300 and at <i class="m">N</i> = 200 (dots). Colors index the gain. (B) Entropy rate per unit <i class="m">H</i>/<i class="m">N</i> (solid, left axis) and dimension per unit <i class="m">D</i>/<i class="m">N</i> (dashed, right axis) against <i class="m">g</i> at <i class="m">N</i> = 1000. (C) <i class="m">H</i> and <i class="m">D</i> against <i class="m">N</i> at <i class="m">g</i> = 5, 10, 20 and 100, with least-squares lines: both grow in proportion to network size. These agree with the published values of Engelken et al. (2023).</figcaption>
-  </figure>
 
   <div class="wrap">
     <h3 id="results">Preliminary results</h3>
@@ -124,7 +125,7 @@
   </div>
   <figure class="still wide">
     <a href="assets/figures/matched-lambda1.webp"><img src="assets/figures/matched-lambda1.webp" width="2400" height="901" loading="lazy" alt="Four panels comparing the three models. A and A-prime: mean spectra at gains where the largest exponent matches; the Barcode spectrum falls much more steeply than the other two. B and C: dimension per unit and entropy rate per unit against the largest exponent, with Random highest, Dynamically critical in the middle and Barcode lowest."></a>
-    <figcaption><b>Figure 6.</b> Early results. (A) Mean Lyapunov spectra of the three models at gains where their largest exponent matches (λ<sub>1</sub> ≈ 0.77: Random at <i class="m">g</i> = 11, Dynamically critical at <i class="m">g</i> = 3, Barcode at <i class="m">g</i> = 10; <i class="m">N</i> = 1000, 20 networks each). (A′) The top of the same spectra: each curve crosses zero at the fraction of positive exponents, and the shaded area above zero is <i class="m">H</i>/<i class="m">N</i>. (B) Dimension per unit <i class="m">D</i>/<i class="m">N</i> and (C) entropy rate per unit <i class="m">H</i>/<i class="m">N</i> against λ<sub>1</sub>. Each curve is traced out by the gain, with selected gains labeled; dotted segments are gains beyond the maximum of λ<sub>1</sub>, and large dots are <i class="m">N</i> = 2000. Barcode averages include only gains at which all 20 networks stay active. For λ<sub>1</sub> above about 0.2, Random has the highest <i class="m">D</i>/<i class="m">N</i> and <i class="m">H</i>/<i class="m">N</i> and Barcode the lowest.</figcaption>
+    <figcaption><b>Figure 5.</b> Same largest exponent, different chaos. (A) Mean Lyapunov spectra of the three architectures at gains where their largest exponent matches (λ<sub>1</sub> ≈ 0.77; Random <i class="m">g</i> = 11, Dynamically critical <i class="m">g</i> = 3, Barcode <i class="m">g</i> = 10; <i class="m">N</i> = 1000). (A′) The top of the same spectra: where each curve crosses zero is <i class="m">n</i><sub>+</sub>/<i class="m">N</i>, the shaded area above zero is <i class="m">H</i>/<i class="m">N</i>. (B) <i class="m">D</i>/<i class="m">N</i> and (C) <i class="m">H</i>/<i class="m">N</i> against λ<sub>1</sub>; each curve is traced out by the gain (one dot per gain on the grid, <i class="m">N</i> = 1000; labelled gains in the model colour). Solid: gains up to the maximum of λ<sub>1</sub>; dotted: larger gains, where λ<sub>1</sub> falls as <i class="m">g</i> rises. Large dots: <i class="m">N</i> = 2000. Barcode averages only where all 20 networks are active.</figcaption>
   </figure>
 </section>
 
