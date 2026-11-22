@@ -16,7 +16,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://valeriefong.github.io/assets/og-card.png">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='11' fill='none' stroke='%232a47a0' stroke-width='3'/%3E%3Cpath d='M24 4v24' stroke='%23b0306a' stroke-width='3'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="assets/site.css?v=02e04c9">
+<link rel="stylesheet" href="assets/site.css?v=202611220412">
 </head>
 <body>
 
@@ -40,18 +40,22 @@
 <section class="project" id="lyapunov" aria-labelledby="ly-h">
   <div class="wrap">
     <h2 id="ly-h">Lyapunov spectra of three recurrent network models</h2>
-    <p>The units of a recurrent network drive one another. When the coupling is weak, activity dies away. When it is strong enough, the network keeps itself active with no input, and two almost identical starting states drift apart. That sensitivity to the starting state is chaos.</p>
-    <p>The classic example is the random network of Sompolinsky, Crisanti and Sommers (1988), <i class="m">dx/dt</i> = −<i class="m">x</i> + <i class="m">gW</i> tanh(<i class="m">x</i>), with Gaussian connection weights of variance 1/<i class="m">N</i>. In large networks, activity decays to rest when the gain <i class="m">g</i> is below 1 and becomes chaotic above it. Panel A of the figure on the <a href="index.html#now">About page</a> shows one such network at three gains.</p>
+    <p>Dynamical models of recurrent neural networks are highly useful tools for understanding the relationship between network connectivity and the resulting firing rate dynamics. The simplest version of this is a linear network without feedforward input, which can produce a limited range of dynamical behaviors and has closed-form solutions. Introducing nonlinearity generates more complex dynamics, including chaos, which emerges when sufficiently strong connections between neurons exist.</p>
+    <p>A classical example of this is a firing-rate model with connection weights randomly sampled from a Gaussian distribution and a tanh activation function. Sompolinsky, Crisanti, and Sommers (1988) characterized this model’s transition to chaos by varying a gain parameter <i class="m">g</i> that controls the overall strength of connections. For a network of <i class="m">N</i> neurons, the dynamics are</p>
+    <p class="eq">τ <i class="m">dx<sub>i</sub>/dt</i> = −<i class="m">x<sub>i</sub></i> + <i class="m">g</i> Σ<sub><i class="m">j</i></sub> <i class="m">W<sub>ij</sub></i> tanh(<i class="m">x<sub>j</sub></i>),</p>
+    <p>with weights drawn with mean zero and variance 1/<i class="m">N</i>. Above a critical value of gain, a bifurcation occurs where the dynamics transition from stable to chaotic; in the large network limit, it occurs precisely at the critical gain value <i class="m">g<sub>c</sub></i> = 1. This random network model has served as a key benchmark in many further studies of recurrent network dynamics, because its transition to chaos can be characterized analytically using dynamical mean field theory. Panel A of the figure on the <a href="index.html#now">About page</a> shows one such network at three gains.</p>
   </div>
 
   <div class="wrap">
-    <h3 id="reading">Reading a Lyapunov spectrum</h3>
-    <p>A Lyapunov exponent is the average exponential rate at which a small perturbation grows or shrinks along one direction in state space. A network of <i class="m">N</i> units has <i class="m">N</i> of them, and sorted from largest to smallest they form its Lyapunov spectrum. I summarize a spectrum with three numbers:</p>
+    <h3 id="reading">Lyapunov spectra</h3>
+    <p>Chaos is defined as sensitive dependence on initial conditions, when arbitrarily small perturbations grow exponentially. Lyapunov exponents measure the rate of divergence between one trajectory initialized at <i class="m">x</i><sub>0</sub> and another trajectory at a nearby point <i class="m">x</i><sub>0</sub> + Δ<i class="m">x</i><sub>0</sub>. When the maximal exponent λ<sub>1</sub> &gt; 0, the trajectories are diverging away from each other exponentially, and when λ<sub>1</sub> &lt; 0, they are converging to a stable attractor.</p>
+    <p>However, this quantity alone does not offer any information about the direction in phase space in which this separation or collapse is occurring. In <i class="m">N</i>-dimensional phase space, there are many more directions of exponential divergence, described by the full Lyapunov spectrum λ<sub>1</sub> ≥ λ<sub>2</sub> ≥ ⋯ ≥ λ<sub><i class="m">N</i></sub>. Characterizing full spectra offers much more information beyond determining whether chaotic dynamics exist. I calculate several derivative quantities from the full spectrum:</p>
     <ul>
-      <li>The largest exponent, λ<sub>1</sub>. If it is positive, the network is chaotic.</li>
-      <li>The sum of the positive exponents, <i class="m">H</i>, which estimates the entropy rate: how fast the dynamics produce new information.</li>
-      <li>The Kaplan–Yorke dimension, <i class="m">D</i>: how many exponents can be added, largest first, before the sum turns negative. It estimates the dimension of the set the activity settles onto.</li>
+      <li>The Kolmogorov–Sinai entropy rate <i class="m">H</i>, a rate of information generation observed in chaotic systems, estimated by summing all positive exponents (Pesin’s identity).</li>
+      <li>The Kaplan–Yorke dimension <i class="m">D</i>, which estimates the dimensionality of a chaotic attractor: <i class="m">k</i> + (λ<sub>1</sub> + ⋯ + λ<sub><i class="m">k</i></sub>)/|λ<sub><i class="m">k</i>+1</sub>|, where <i class="m">k</i> is the largest index such that the cumulative sum of exponents is non-negative.</li>
+      <li>The count of positive exponents <i class="m">n</i><sub>+</sub>, a measure of the number of independent directions of expansion.</li>
     </ul>
+    <p>I focus on population-normalized variants of all quantities (<i class="m">H</i>/<i class="m">N</i>, <i class="m">D</i>/<i class="m">N</i>, <i class="m">n</i><sub>+</sub>/<i class="m">N</i>) to understand per-unit average contributions to the chaotic dynamics.</p>
   </div>
   <figure class="still wide">
     <a href="assets/figures/spectrum-reading.svg"><img src="assets/figures/spectrum-reading.svg" width="1000" height="410" loading="lazy" alt="Left: 1000 Lyapunov exponents sorted from largest to smallest, falling from 0.41 to about −2.4, with the 37 positive ones shaded. Right: the first 120 exponents with their running sum, which rises to about 6.9 and returns to zero at index 79.3."></a>
@@ -59,7 +63,7 @@
   </figure>
   <div class="wrap">
     <h3 id="algorithm">How the exponents are computed</h3>
-    <p>The method goes back to Benettin et al. (1980). Follow the network along its trajectory, and use its Jacobian to carry a set of small perturbation vectors along with it. Left alone, they would all swing toward the fastest-growing direction and grow or shrink without bound. So at regular intervals they are made perpendicular to one another again and rescaled to length one, and the logarithm of each length is recorded first. Averaged over time, those logarithms are the Lyapunov exponents. Making a set of vectors perpendicular, one after another, is a QR decomposition, which gives the method its name. My implementation follows Engelken et al. (2023).</p>
+    <p>The full spectrum is numerically estimated following the standard iterative Jacobian-based method developed by Shimada and Nagashima (1979) and Benettin et al. (1980). In the algorithm, an <i class="m">N</i> × <i class="m">N</i> system of orthonormal perturbation vectors is evolved alongside the trajectory using the Jacobian. A QR decomposition is periodically performed to reorthonormalize the perturbations. This procedure prevents collapse onto the dominant direction of exponential divergence, which would lose all information about an additional <i class="m">N</i> − 1 independent directions. The Lyapunov exponents are estimated by accumulating the logarithms of the absolute values of the diagonal entries <i class="m">R<sub>ii</sub></i> of each QR decomposition and averaging over the total accumulation time. Figure 2 shows the procedure for the first two vectors.</p>
   </div>
   <figure class="interactive wide" id="qr-demo">
     <div class="qr-panels">
@@ -96,7 +100,7 @@
 
   <div class="wrap">
     <h3 id="random">Chaos in the random network</h3>
-    <p>Figure 4 shows how the spectrum of the random network changes with gain and network size. It is the baseline every other model is read against, and it reproduces the published results of Engelken et al. (2023).</p>
+    <p>The full Lyapunov spectrum of the classical random network model was characterized by Engelken et al. (2023). Its chaos is extensive, its spectrum is point-symmetric around −1/τ, and its attractor fills under 10% of the phase-space dimension. Figure 4 shows these properties in my simulations, which serve as the baseline every other model is read against.</p>
   </div>
   <figure class="still wide">
     <a href="assets/figures/random-baseline.webp"><img src="assets/figures/random-baseline.webp" width="2400" height="1100" loading="lazy" alt="Three panels for the random network. A: Lyapunov spectra for gains from 0 to 300, all falling from positive values at the left to about minus 4 at the right. B: entropy rate per unit and dimension per unit against gain, both rising quickly and then leveling off. C: entropy rate and dimension against network size at four gains, each a straight line."></a>
@@ -104,19 +108,18 @@
   </figure>
 
   <div class="wrap">
-    <h3 id="models">Three ways to build the network</h3>
-    <p>The project compares three models, each chaotic for a different structural reason. Panel B of the figure on the <a href="index.html#now">About page</a> shows one network of each.</p>
-    <ul>
-      <li><b>Random.</b> The classical network of Sompolinsky, Crisanti and Sommers (1988), used as the baseline.</li>
-      <li><b>Dynamically critical.</b> Random connectivity in which the 30% of eigenvalues with the largest real part are moved to a common real part just below one before the gain is applied, so a large group of modes reaches the stability boundary together.</li>
-      <li><b>Barcode.</b> The model of Fang et al. (2025): random connectivity with net inhibition, and a leak on every unit that grows with the network’s total activity.</li>
-    </ul>
+    <h3 id="models">Three network models</h3>
+    <p>The three network models considered here share the common goal of modeling firing-rate dynamics, but they differ in their connectivity structure and stabilization mechanisms. The classical random network provides a deeply-studied reference for studying the emergence of chaos by increasing recurrent connection strength. The dynamically critical (DC) network introduces a modification to this connectivity, with an extensive fraction of the eigenvalue spectrum placed on the edge of instability, and the Barcode network stabilizes recurrent activity with global inhibition and an activity-dependent leak. My analysis focuses only on autonomous dynamics in the absence of input. Panel B of the figure on the <a href="index.html#now">About page</a> shows one network of each.</p>
+    <p><b>Dynamically critical networks</b> are defined by their many dynamic modes on the edge of instability (Magnasco et al., 2009). I build one from the random connectivity by shifting approximately 30% of its eigenvalues to a real part of 0.99, keeping the eigenvectors and all imaginary parts. This model class is intentionally posed on the edge of a bifurcation where many dynamic modes will lose stability at once, unlike the randomly connected case, in which few modes lose stability at the initial onset of chaos. It is unknown how these networks behave after undergoing this bifurcation.</p>
+    <p><b>Barcode networks</b> (Fang et al., 2025) have random normal weights, but use a ReLU activation function, global inhibition, and an activity-dependent leak that tracks overall network activity, a divisive normalization mechanism that stabilizes high activity dynamically. Due to the ReLU activation and dynamic leak, the origin is not an isolated fixed point as it was in the previous models, so the transition to chaos in the Barcode model cannot be described by an eigenvalue crossing alone.</p>
+    <p>I extend the Lyapunov spectrum analysis to these two additional classes of recurrent networks, to determine whether each variant of the architecture produces different signatures of chaos, while exploring the effects of network size and overall connection strength in each setting.</p>
   </div>
 
   <div class="wrap">
     <h3 id="design">Study design and validation</h3>
-    <p>I own this project end to end, from experimental design to analysis. I built a Python/PyTorch simulation pipeline with SLURM job arrays covering 1,060 parameter combinations for the three models (up to <i class="m">N</i> = 2,000), with 20 networks at each, generating about 22,000 runs over nearly 90,000 CPU core-hours.</p>
-    <p>I adapted and extended a published Lyapunov-spectrum solver (Engelken et al., 2023; QR/Benettin method, RK4 integration). I validated it against a reference implementation (Figure 4) and checked numerical convergence via paired comparisons of step size, reorthonormalization interval, duration, and precision.</p>
+    <p>I own this project end to end, from experimental design to analysis. I built a Python/PyTorch simulation pipeline with SLURM job arrays covering 1,060 parameter combinations for the three models, generating about 22,000 runs over nearly 90,000 CPU core-hours. For each combination of network size and gain, 20 network realizations are simulated, from <i class="m">N</i> = 20 up to <i class="m">N</i> = 2,000. Gain is varied from <i class="m">g</i> = 0 to 300 for the Random and DC networks and from 0 to 120 for the Barcode network, sampled most densely near the empirically observed onset of chaos and the maxima of entropy and dimension.</p>
+    <p>Simulations are divided into three phases, to separate convergence of the trajectory to an attractor, convergence of the tangent basis, and longer-term accumulation of the stretching rates: a 500τ transient with only the network state evolved, a 100τ warm-up of the tangent basis, and accumulation of the exponents over 1000τ. Network dynamics are integrated by a fixed-step fourth-order Runge–Kutta method, and the tangent basis is advanced with the derivative of the discrete RK4 step, using closed-form analytic Jacobians for each model; these agree with automatic differentiation to within 10<sup>−15</sup>.</p>
+    <p>I adapted and extended a published Lyapunov-spectrum solver (Engelken et al., 2023), validated it against a reference implementation (Figure 4), and checked numerical convergence via paired comparisons of step size, reorthonormalization interval, duration, and precision.</p>
   </div>
 
   <div class="wrap">
@@ -149,6 +152,6 @@
   <p><a href="https://www.linkedin.com/in/valfong/">linkedin.com/in/valfong</a></p>
 </footer>
 
-<script src="assets/js/viz.js?v=02e04c9"></script>
+<script src="assets/js/viz.js?v=202611220412"></script>
 </body>
 </html>

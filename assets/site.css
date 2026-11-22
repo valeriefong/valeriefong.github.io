@@ -126,6 +126,7 @@ section.block>figure.still.narrow{margin-inline:0}
 .project ul{margin:0 0 1rem;padding-left:1.2rem}
 .project li{margin-bottom:.4rem}
 .project h3{margin-top:2rem}
+.project p.eq{text-align:center;margin:1.1rem 0;font-variant-numeric:lining-nums}
 .stage{margin-inline:auto;max-width:60rem}
 
 /* ---------- experience lists (home + cv) ---------- */
