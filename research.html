@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Research · Valerie Fong</title>
-<meta name="description" content="Research by Valerie Fong on dynamically critical recurrent networks: Lyapunov spectra, sequence generation, and self-tuning.">
+<meta name="description" content="Research by Valerie Fong: a large simulation study of chaos in three recurrent neural network models, measured with full Lyapunov spectra.">
 <meta property="og:title" content="Research · Valerie Fong">
-<meta property="og:description" content="Lyapunov spectra, sequence generation, and self-tuning in dynamically critical recurrent networks.">
+<meta property="og:description" content="A large simulation study of chaos in three recurrent neural network models, measured with full Lyapunov spectra.">
 <meta property="og:url" content="https://valeriefong.github.io/research.html">
 <meta property="og:type" content="website">
 <meta property="og:image" content="https://valeriefong.github.io/assets/og-card.png">
@@ -31,7 +31,7 @@
 
 <header class="intro wrap">
   <h1>Research</h1>
-  <p class="lead">My PhD research with Rishidev Chaudhuri at UC Davis studies recurrent networks in which many oscillatory modes sit at the edge of stability at once. Their activity winds through a high-dimensional space for a long time without repeating, which may give the brain a rich substrate for timing and sequence generation.</p>
+  <p class="lead">My PhD research with Rishidev Chaudhuri at UC Davis characterizes chaotic recurrent neural networks, in the computational-neuroscience sense (not deep-learning RNNs). My current project compares how two stabilizing mechanisms shape sensitivity to perturbation (full Lyapunov spectra, attractor dimension, entropy) across network size and gain, against a baseline random network. A manuscript is in preparation.</p>
 </header>
 
 <main>
@@ -106,76 +106,36 @@
     <a href="assets/figures/three-models.webp"><img src="assets/figures/three-models.webp" width="2400" height="2200" loading="lazy" alt="Three columns labelled Random, Dynamically critical and Barcode. Top row: rings of eight units and their connections; the Dynamically critical ring has thick self-connections. Middle row: eigenvalues of each connectivity matrix; Random and Barcode fill a disc, while in Dynamically critical the right part of the disc is empty and those eigenvalues sit on a vertical line. Bottom row: irregular activity of five units in each network."></a>
     <figcaption><b>Figure 4.</b> One 1000-unit network of each model at a gain where it is chaotic (Random and Dynamically critical at <i class="m">g</i> = 2, Barcode at <i class="m">g</i> = 7). Top: eight units and their connections, with self-connections as loops. Orange is excitatory, grey is inhibitory, and stronger connections are thicker and darker. Middle: eigenvalues of the connectivity matrix, in units of <i class="m">g</i>, with a circle of radius <i class="m">g</i>. In the Dynamically critical network the moved eigenvalues line up on the right. The Barcode matrix has one more eigenvalue far to the left, near its mean inhibition μ = −40. Bottom: activity of five units.</figcaption>
   </figure>
+
+
   <div class="wrap">
-    <p>For each model I have computed full spectra for networks of 20 to 2000 units, at gains from below the transition to deep in the chaotic regime: 21,150 runs, with 20 networks per condition (10 for the largest Barcode networks). The question is how λ<sub>1</sub>, <i class="m">H</i>/<i class="m">N</i> and <i class="m">D</i>/<i class="m">N</i> depend on the gain and on network size in each model, and whether structured connectivity or an activity-dependent leak changes that dependence relative to the random baseline. The analysis is under way, and I’ll add the comparison here when the write-up is done.</p>
+    <h3 id="design">Study design and validation</h3>
+    <p>I own this project end to end, from experimental design to analysis. I built a Python/PyTorch simulation pipeline with SLURM job arrays covering 1,060 parameter combinations for the three models (up to <i class="m">N</i> = 2,000), with 20 networks at each, generating about 22,000 runs over nearly 90,000 CPU core-hours.</p>
+    <p>I adapted and extended a published Lyapunov-spectrum solver (Engelken et al., 2023; QR/Benettin method, RK4 integration). I validated it against a reference implementation (Figure 5) and checked numerical convergence via paired comparisons of step size, reorthonormalization interval, duration, and precision.</p>
   </div>
-
-</section>
-
-<!-- ============ Sequence generation ============ -->
-<section class="project" id="sequences" aria-labelledby="seq-h">
-  <div class="wrap">
-    <h2 id="seq-h">Sequence generation in dynamically critical networks</h2>
-    <p>In a linear network <i class="m">dx/dt</i> = <i class="m">Ax</i>, I construct the connectivity so that many complex-conjugate eigenvalue pairs sit just left of the imaginary axis. Each pair contributes a slowly decaying oscillation. With incommensurate frequencies, their sum is quasiperiodic: it never exactly repeats.</p>
-    <p>To measure how long the activity takes to come back, I track the cosine similarity between the current state and the starting state. The recurrence time is the first moment it climbs back above a threshold. A downstream neuron with a rectified linear response can then fire at one particular moment, when the state lines up with its weights.</p>
-  </div>
-
-  <figure class="interactive wide">
-    <div class="seq-panels">
-      <div class="panel traj"><canvas id="seq-traj" role="img" aria-label="The network's activity projected onto two dimensions, colored by time."></canvas></div>
-      <div class="panel plot"><canvas id="seq-plot" role="img" aria-label="Similarity of the state to its starting direction over time, and four readout neurons that fire when the state matches their target."></canvas></div>
-    </div>
-    <div class="controls">
-      <label for="seq-k">Oscillatory modes <i class="m">K</i> = <output id="seq-kout" for="seq-k">3</output></label>
-      <input id="seq-k" type="range" min="2" max="24" step="1" value="3">
-      <button id="seq-new" type="button">New network</button>
-    </div>
-    <p class="readout" id="seq-readout" aria-live="polite"></p>
-    <figcaption><b>Figure 5.</b> Activity is a sum of <i class="m">K</i> oscillations with random frequencies and decay rates between 0.001 and 0.004 per time unit, so every mode is near critical. Right, top: cosine similarity between the state and its starting direction; the dashed line is the 0.9 threshold and the red mark is the first return. Right, bottom: four readout neurons, each tuned to the state at the moment marked by its triangle, responding in proportion to max(0, similarity − 0.9). Try a few modes, then many.</figcaption>
+  <figure class="still wide">
+    <a href="assets/figures/random-baseline.webp"><img src="assets/figures/random-baseline.webp" width="2400" height="1100" loading="lazy" alt="Three panels for the random network. A: Lyapunov spectra for gains from 0 to 300, all falling from positive values at the left to about minus 4 at the right. B: entropy rate per unit and dimension per unit against gain, both rising quickly and then leveling off. C: entropy rate and dimension against network size at four gains, each a straight line."></a>
+    <figcaption><b>Figure 5.</b> The random baseline. (A) Lyapunov spectra λ<sub><i class="m">i</i></sub> against <i class="m">i</i>/<i class="m">N</i>, averaged over 20 networks, at <i class="m">N</i> = 1000 (lines) for <i class="m">g</i> from 0 to 300 and at <i class="m">N</i> = 200 (dots). Colors index the gain. (B) Entropy rate per unit <i class="m">H</i>/<i class="m">N</i> (solid, left axis) and dimension per unit <i class="m">D</i>/<i class="m">N</i> (dashed, right axis) against <i class="m">g</i> at <i class="m">N</i> = 1000. (C) <i class="m">H</i> and <i class="m">D</i> against <i class="m">N</i> at <i class="m">g</i> = 5, 10, 20 and 100, with least-squares lines: both grow in proportion to network size. These agree with the published values of Engelken et al. (2023).</figcaption>
   </figure>
 
   <div class="wrap">
-    <p>The same picture in my simulations, with connectivity built so that its spectrum hugs the imaginary axis:</p>
+    <h3 id="results">Preliminary results</h3>
+    <p>At matched maximum exponent λ<sub>1</sub>, the three networks can have different entropy and attractor dimension, and their spectra have clearly different shapes, so λ<sub>1</sub> alone doesn’t tell the whole story. This is still being analyzed.</p>
   </div>
   <figure class="still wide">
-    <a href="assets/figures/dcn-spectrum.webp"><img src="assets/figures/dcn-spectrum.webp" width="2400" height="864" loading="lazy" alt="Three panels: eigenvalues of A clustered along the imaginary axis; activity traces of three units; the trajectory in three dimensions."></a>
-    <figcaption><b>Figure 6.</b> (A) Eigenvalues of <i class="m">A</i>, with many modes clustered at Re λ ≈ 0. (B) Activity of three units. (C) The same trajectory in three dimensions.</figcaption>
-  </figure>
-
-  <div class="wrap">
-    <p>In preliminary simulations, recurrence time grows rapidly with network size, because larger networks hold more near-critical modes.</p>
-  </div>
-  <figure class="still wide">
-    <a href="assets/figures/recurrence.webp"><img src="assets/figures/recurrence.webp" width="2400" height="968" loading="lazy" alt="Left: a trajectory returning near its starting direction. Right: recurrence time rising with network size on a log scale."></a>
-    <figcaption><b>Figure 7.</b> (A) Recurrence is the first time the trajectory’s direction (red) comes back within a small angle of its starting direction (black). (B) Recurrence time against network size <i class="m">N</i>, log scale. Each point summarizes 20 networks, each with its own connectivity and initial condition. Preliminary.</figcaption>
-  </figure>
-
-  <div class="wrap">
-    <p>I’m now testing how well banks of rectified linear readouts can decode these trajectories into sequences of timed pulses.</p>
-  </div>
-  <figure class="still wide">
-    <a href="assets/figures/readout.webp"><img src="assets/figures/readout.webp" width="2400" height="612" loading="lazy" alt="Left: a trajectory crossing a readout hyperplane, producing a single pulse. Right: a recurrent network driving four readouts that peak at different times."></a>
-    <figcaption><b>Figure 8.</b> Schematic. (A) A readout with weights α fires when the trajectory crosses its hyperplane at time <i class="m">t̂</i>. (B) The network drives several readouts, each peaking at its own time.</figcaption>
+    <a href="assets/figures/matched-lambda1.webp"><img src="assets/figures/matched-lambda1.webp" width="2400" height="901" loading="lazy" alt="Four panels comparing the three models. A and A-prime: mean spectra at gains where the largest exponent matches; the Barcode spectrum falls much more steeply than the other two. B and C: dimension per unit and entropy rate per unit against the largest exponent, with Random highest, Dynamically critical in the middle and Barcode lowest."></a>
+    <figcaption><b>Figure 6.</b> Early results. (A) Mean Lyapunov spectra of the three models at gains where their largest exponent matches (λ<sub>1</sub> ≈ 0.77: Random at <i class="m">g</i> = 11, Dynamically critical at <i class="m">g</i> = 3, Barcode at <i class="m">g</i> = 10; <i class="m">N</i> = 1000, 20 networks each). (A′) The top of the same spectra: each curve crosses zero at the fraction of positive exponents, and the shaded area above zero is <i class="m">H</i>/<i class="m">N</i>. (B) Dimension per unit <i class="m">D</i>/<i class="m">N</i> and (C) entropy rate per unit <i class="m">H</i>/<i class="m">N</i> against λ<sub>1</sub>. Each curve is traced out by the gain, with selected gains labeled; dotted segments are gains beyond the maximum of λ<sub>1</sub>, and large dots are <i class="m">N</i> = 2000. Barcode averages include only gains at which all 20 networks stay active. For λ<sub>1</sub> above about 0.2, Random has the highest <i class="m">D</i>/<i class="m">N</i> and <i class="m">H</i>/<i class="m">N</i> and Barcode the lowest.</figcaption>
   </figure>
 </section>
 
-<!-- ============ Self-tuning ============ -->
-<section class="project" id="self-tuning" aria-labelledby="st-h">
+<!-- ============ Other work ============ -->
+<section class="project" id="other" aria-labelledby="other-h">
   <div class="wrap">
-    <h2 id="st-h">Networks that tune themselves</h2>
-    <p>Criticality doesn’t have to be built by hand. Magnasco et al. (2009) showed that a local learning rule can drive a network’s eigenvalues to the stability boundary on its own. I reimplemented that model as a starting point for asking which computations this regime supports.</p>
-  </div>
-  <figure class="still wide">
-    <a href="assets/figures/self-tuning.webp"><img src="assets/figures/self-tuning.webp" width="2400" height="1078" loading="lazy" alt="Eigenvalues of W over time collapsing toward zero real part, with bounded oscillatory activity traces and a three-dimensional trajectory."></a>
-    <figcaption><b>Figure 9.</b> Eigenvalues of <i class="m">W</i> over time on a log scale: the real parts (black) collapse toward zero as the network tunes itself, while activity stays bounded and oscillatory.</figcaption>
-  </figure>
-</section>
-
-<!-- ============ Data ============ -->
-<section class="project" id="data" aria-labelledby="data-h">
-  <div class="wrap">
-    <h2 id="data-h">Learning dynamics from recordings</h2>
-    <p>I’ve also applied dynamic mode decomposition, a data-driven method for learning linear dynamics from time series, to Neuropixels recordings from the Hanks Lab.</p>
+    <h2 id="other-h">Other work</h2>
+    <h3>Dynamic mode decomposition (UC Davis)</h3>
+    <p>Explored Dynamic Mode Decomposition on high-dimensional neural recordings, working with the neuroscientists who collected the data to understand its context.</p>
+    <h3>Global sensitivity analysis (University of New Mexico, 2021–2022)</h3>
+    <p>As a Ronald E. McNair Scholar and ASSURE Fellow, I applied variance-based Sobol’ global sensitivity analysis to attribute variability in Hodgkin–Huxley neuron model outputs to eight uncertain parameters and their interactions, across hundreds of thousands of simulations, and presented the findings at three national McNair research conferences.</p>
   </div>
 </section>
 

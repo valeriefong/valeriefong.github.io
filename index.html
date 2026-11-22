@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Valerie Fong</title>
-<meta name="description" content="Valerie Fong, applied mathematician and PhD candidate at UC Davis, studying recurrent networks with many oscillatory modes at the edge of stability.">
+<meta name="description" content="Valerie Fong, applied mathematician and PhD candidate at UC Davis: large-scale simulation, statistical analysis and model validation, applied to chaos in recurrent neural network models.">
 <meta property="og:title" content="Valerie Fong">
-<meta property="og:description" content="Applied mathematician studying how networks at the edge of stability generate long sequences of activity.">
+<meta property="og:description" content="Applied mathematician: large-scale simulation, statistical analysis and model validation.">
 <meta property="og:url" content="https://valeriefong.github.io/">
 <meta property="og:type" content="website">
 <meta property="og:image" content="https://valeriefong.github.io/assets/og-card.png">
@@ -33,8 +33,8 @@
 <header class="intro">
   <h1>Valerie Fong</h1>
   <p class="lead">I’m an applied mathematician finishing a PhD at UC Davis (expected December 2027). My research involves building and simulating large dynamical models of recurrent neural networks. My goal is to understand how many interacting units jointly give rise to behaviors that may support information processing and computation in the brain.</p>
-  <p>I focus on networks held near the edge of stability, where oscillations at many incommensurate frequencies combine into long-lasting, non-repeating transients. I study sequence generation in these networks and characterize their dynamics with Lyapunov spectra, from which I compute the Kaplan–Yorke dimension and Kolmogorov–Sinai entropy. A central question is capacity: how many distinct states and sequences these networks can represent, and whether simple readouts, such as ReLU neurons, could use them for temporal computation.</p>
-  <p>Before graduate school I was a data science intern at iRhythm Technologies, where I applied and compared time-series forecasting methods on product demand data, and an intern at Sandia National Laboratories, where I compiled incident data, maintained a metrics dashboard, and earned a Lean Six Sigma Green Belt.</p>
+  <p>In my PhD research I own a project end to end, from experimental design to analysis. I built a Python/PyTorch simulation pipeline with SLURM job arrays covering 1,060 parameter combinations for three recurrent network models (up to 2,000 units), generating about 22,000 runs over nearly 90,000 CPU core-hours. I adapted and extended a published Lyapunov-spectrum solver (QR/Benettin method, RK4 integration), validated it against a reference implementation, and checked numerical convergence via paired comparisons of step size, reorthonormalization interval, duration, and precision. I’m now analyzing the resulting dataset to compare how two stabilizing mechanisms shape sensitivity to perturbation (full Lyapunov spectra, attractor dimension, entropy) across network size and gain, against a baseline random network. A manuscript is in preparation.</p>
+  <p>Before graduate school I was a data science intern at iRhythm Technologies, where I explored time-series forecasting approaches on multi-year daily product-order data, and an intern at Sandia National Laboratories, where I compiled incident data, maintained a metrics dashboard, and earned a Lean Six Sigma Green Belt.</p>
   <div class="contact">
     <a href="files/Valerie_Fong_Resume.pdf">Resume (PDF)</a>
     <a href="mailto:valfong@ucdavis.edu">valfong@ucdavis.edu</a>
@@ -49,82 +49,21 @@
 
 <main>
 <section class="block wide" id="now" aria-labelledby="now-h">
-  <h2 id="now-h">What I’m working on now</h2>
-  <p class="section-intro">I compute full Lyapunov spectra for three models of recurrent networks, to compare how chaos in each one depends on coupling strength and network size. The units of a recurrent network drive one another. When the coupling is weak, activity dies away. When it is strong enough, the network keeps itself active with no input, and two almost identical starting states drift apart.</p>
+  <h2 id="now-h">Current project: chaos in recurrent networks</h2>
+  <p class="section-intro">When the coupling between units is weak, activity dies away. When it is strong enough, the network keeps itself active with no input, and two almost identical starting states drift apart: the network is chaotic. The Lyapunov spectrum measures that sensitivity, one direction at a time.</p>
   <figure class="still">
     <img src="assets/figures/chaos-transition.webp" width="2400" height="1530" alt="Three columns labelled Stable, Chaotic and Strongly chaotic. Top row: a ring of eight units whose connections get thicker from left to right. Bottom row: activity of five units, which decays to zero in the first column and fluctuates irregularly, with growing amplitude, in the other two.">
-    <figcaption>One random network of 1000 units, <i class="m">dx/dt</i> = −<i class="m">x</i> + <i class="m">gW</i> tanh(<i class="m">x</i>), at coupling strengths <i class="m">g</i> = 0.9, 2 and 5. The connectivity <i class="m">W</i> is the same in every column and only <i class="m">g</i> changes. Top: eight of the units and every connection among them. Orange is excitatory, grey is inhibitory, and stronger connections are thicker and darker. Bottom: activity of five units from one random starting state. The stable panel has its own, shorter axes so the decay is visible. <a href="research.html#lyapunov">The three models, and how the Lyapunov spectrum is computed</a></figcaption>
+    <figcaption>One random network of 1000 units, <i class="m">dx/dt</i> = −<i class="m">x</i> + <i class="m">gW</i> tanh(<i class="m">x</i>), at coupling strengths <i class="m">g</i> = 0.9, 2 and 5. The connectivity <i class="m">W</i> is the same in every column and only <i class="m">g</i> changes. Top: eight of the units and every connection among them. Orange is excitatory, grey is inhibitory, and stronger connections are thicker and darker. Bottom: activity of five units from one random starting state. The stable panel has its own, shorter axes so the decay is visible. <a href="research.html#lyapunov">The three models, how the spectrum is computed, and early results</a></figcaption>
   </figure>
-</section>
-
-<section class="block wide" aria-labelledby="ideas-h">
-  <h2 id="ideas-h">Three ideas behind the work</h2>
-
-  <div class="preview">
-    <div class="text">
-      <h3>Modes near the edge of stability</h3>
-      <p>A linear network’s activity is a sum of modes, each an oscillation that grows or decays at a rate set by its eigenvalue. A mode whose eigenvalue sits just left of the imaginary axis fades very slowly, so it can carry information for a long time.</p>
-      <p class="more"><a href="research.html#sequences">How I use many of them at once</a></p>
-    </div>
-    <figure class="stage stage-mode" style="margin:0">
-      <div class="panel"><canvas id="mode-canvas" role="img" aria-label="A single oscillating mode shown as a spiral in the complex plane and as activity over time."></canvas></div>
-      <div class="controls">
-        <label for="mode-alpha">Real part α = <output id="mode-aout" for="mode-alpha">−0.15</output></label>
-        <input id="mode-alpha" type="range" min="-0.5" max="0.04" step="0.005" value="-0.15">
-      </div>
-      <p class="readout" id="mode-readout" aria-live="polite"></p>
-    </figure>
-  </div>
-
-  <div class="preview">
-    <div class="text">
-      <h3>Quasiperiodicity</h3>
-      <p>Two oscillations together move a point around a torus. If their frequencies have a rational ratio, the path closes and repeats. If the ratio is irrational, it never does. A network with many such frequencies traces a path that takes an extremely long time to come back.</p>
-      <p class="more"><a href="research.html#sequences">Measuring how long it takes to return</a></p>
-    </div>
-    <figure class="stage stage-torus" style="margin:0">
-      <div class="panel"><canvas id="torus-canvas" role="img" aria-label="A path winding around a torus."></canvas></div>
-      <div class="controls">
-        <div class="seg" role="group" aria-label="Frequency ratio">
-          <button id="torus-golden" type="button" aria-pressed="true">Irrational ratio</button>
-          <button id="torus-rational" type="button" aria-pressed="false">Rational ratio</button>
-        </div>
-      </div>
-      <p class="readout" id="torus-readout" aria-live="polite"></p>
-    </figure>
-  </div>
-
-  <div class="preview" id="edge">
-    <div class="text">
-      <h3>The transition to chaos</h3>
-      <p>In the classic random network of Sompolinsky, Crisanti and Sommers (1988), raising the gain <i class="m">g</i> pushes the connectivity’s eigenvalues past a boundary, and quiet activity gives way to self-sustained, chaotic activity. Only a few eigenvalues cross at first. My work asks what happens when many cross together.</p>
-      <p class="more"><a href="research.html#lyapunov">Measuring chaos with Lyapunov exponents</a></p>
-    </div>
-    <figure class="stage" style="margin:0">
-      <div class="gain-panels">
-        <div class="panel spec"><canvas id="spec" role="img" aria-label="Eigenvalues of the scaled connectivity matrix with the stability boundary at real part one."></canvas></div>
-        <div class="panel trace"><canvas id="trace" role="img" aria-label="Activity of six units over time."></canvas></div>
-      </div>
-      <div class="controls">
-        <label for="gain">Gain <i class="m">g</i> = <output id="gout" for="gain">1.00</output></label>
-        <input id="gain" type="range" min="0.5" max="1.6" step="0.01" value="1.00">
-        <button id="kick" type="button">Perturb the network</button>
-      </div>
-      <p class="readout" id="readout" aria-live="polite"></p>
-      <figcaption>A network of 160 units, <i class="m">dx/dt</i> = −<i class="m">x</i> + <i class="m">gW</i> tanh(<i class="m">x</i>), with Gaussian weights of variance 1/<i class="m">N</i>. Left: eigenvalues of <i class="m">gW</i>. Right: rates tanh(<i class="m">x</i>) of six units.</figcaption>
-    </figure>
-  </div>
 </section>
 
 <section class="block wrap" aria-labelledby="kit-h">
   <h2 id="kit-h">Toolkit</h2>
   <dl class="kit">
-    <dt>Dynamics and modeling</dt>
-    <dd>Numerical ODE integration, eigenspectral analysis, Lyapunov spectra by QR reorthonormalization, dynamic mode decomposition, large-scale simulation</dd>
+    <dt>Programming and data</dt>
+    <dd>Python (Pandas, NumPy, SciPy, scikit-learn, PyTorch), SQL, R, Git, HPC/SLURM</dd>
     <dt>Statistics and machine learning</dt>
-    <dd>Time series forecasting (ARIMA, empirical mode decomposition, seasonal-trend decomposition), global sensitivity analysis (Sobol’ indices), PCA, k-means, convolutional networks</dd>
-    <dt>Software</dt>
-    <dd>Python (NumPy, SciPy, Matplotlib), R, MATLAB, Git, LaTeX, high-performance computing</dd>
+    <dd>Regression, time-series forecasting (ARIMA, decomposition methods), unsupervised learning (k-means, PCA), global sensitivity analysis, CNNs</dd>
   </dl>
 </section>
 </main>

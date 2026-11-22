@@ -9,4 +9,5 @@ Valerie's personal site. Read README.md for the file layout.
 - After changing `assets/site.css` or `assets/js/viz.js`, bump the `?v=` on their links in every page (any new value, e.g. the short commit hash) so browsers don't keep the cached old file.
 - Live figures in `assets/js/viz.js` must be numerically honest. Captions say exactly what is computed, and nothing claims a result she doesn't have yet. Her own figures are working drafts.
 - Ongoing goal: replace the generic demos on the Research page with ones driven by her own code (the `rnn-lyapunov` repo, which is private), e.g. random vs dynamically critical connectivity.
+- Sequence-generation material is shelved, not deleted: see "Archived: sequence generation" in README.md (branch `archive/sequence-generation`). Don't delete its figures or `viz.js` sections.
 - Resume source: `resume/resume.tex` (LaTeX, compiled with pdfLaTeX; she edits it in Overleaf) produces `files/Valerie_Fong_Resume.pdf` (one page). `cv.html` is the long form, so keep the two consistent.

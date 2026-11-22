@@ -27,3 +27,9 @@ Open any `.html` file in a browser. Everything works locally except the live fig
 ## Rebuilding the resume PDF
 
 The source is `resume/resume.tex`. Compile it with pdfLaTeX, either on Overleaf (upload the file, then download the PDF) or locally with `pdflatex resume.tex` from the `resume` folder. Save the PDF over `files/Valerie_Fong_Resume.pdf` so the site links keep working. Keep it to one page. The CV page (`cv.html`) is separate, so update both.
+
+## Archived: sequence generation
+
+The sequence-generation material (Research: "Sequence generation in dynamically critical networks" and "Networks that tune themselves", with Figures 5–9; About: the "Three ideas behind the work" demos) was taken off the site on Nov 21, 2026 to focus it on the Lyapunov spectra study. It is kept on the branch `archive/sequence-generation` (the site exactly as it was). The figures and live-demo code are also still in `assets/` (`assets/figures/dcn-spectrum.webp`, `recurrence.webp`, `readout.webp`, `self-tuning.webp`; the mode, torus, gain and sequence sections of `assets/js/viz.js`). They do nothing while no page uses them.
+
+To bring a section back, view the old page with `git show archive/sequence-generation:research.html` and copy the section in, or restore a whole file with `git checkout archive/sequence-generation -- research.html`.

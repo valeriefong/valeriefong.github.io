@@ -1,5 +1,4 @@
-
-% Valerie Fong — one-page quantitative research / data science resume
+% Valerie Fong — one-page resume (same as the Meta Product Analytics version, Nov 2026)
 % Build: pdflatex resume.tex
 \documentclass[10pt,letterpaper]{article}
 
@@ -70,8 +69,9 @@
 \href{mailto:valfong@ucdavis.edu}{valfong@ucdavis.edu}\cbar
 505-850-3795\cbar
 \href{https://valeriefong.github.io}{valeriefong.github.io}\cbar
-% \href{https://github.com/valeriefong}{github.com/valeriefong}\cbar
-\href{https://linkedin.com/in/valfong}{linkedin.com/in/valfong}}
+\href{https://github.com/valeriefong}{github.com/valeriefong}\cbar
+\href{https://linkedin.com/in/valfong}{linkedin.com/in/valfong}}\par\vspace{3pt}
+{\itshape Applied mathematics and statistics: metrics, large-scale data analysis, forecasting, and model validation}
 \end{center}
 \vspace{-8pt}
 
@@ -92,32 +92,12 @@
 \gap
 \textbf{Fellowships:} NSF Graduate Research Fellowship; National GEM Consortium Ph.D. Fellowship; UC Davis Hazel B. Jacoby Fellowship
 
-\section*{Research Experience}
-
-\entry{\textbf{University of California, Davis}, Graduate Student Researcher}
-{2022 -- Present}
-\begin{itemize}
-  \item Developed a Python/PyTorch simulation pipeline with SLURM job arrays to study Lyapunov spectra in three recurrent network models, scaling to $N=2{,}000$ neurons across 1,060 parameter combinations: about 25,000 simulation runs and 70,000 CPU core-hours on an HPC cluster.
-  \item Adapted and extended a published Lyapunov-spectrum solver using the QR/Benettin method, fixed-step RK4 integration, and tangent dynamics; validated the pipeline against a reference implementation and assessed numerical convergence through paired comparisons of step size, orthonormalization interval, simulation duration, precision, and network size.
-  \item Analyzing the resulting simulation dataset to determine how two stabilizing mechanisms shape the dependence of Lyapunov spectra on network size and gain, relative to a classical random-network baseline.
-  \item Explored Dynamic Mode Decomposition on high-dimensional neural recordings, working with the experimental neuroscientists who collected the data to understand its biological and experimental context.
-\end{itemize}
-
-\gap
-\entry{\textbf{University of New Mexico}, Ronald E. McNair Scholar and ASSURE Fellow}
-{2021 -- 2022}
-\begin{itemize}
-  \item Applied variance-based Sobol' global sensitivity analysis to quantify how uncertainty in eight model parameters influences Hodgkin--Huxley single-neuron model outputs across hundreds of thousands of simulations.
-  \item Presented research findings at three national McNair research conferences.
-\end{itemize}
-
-\section*{Professional Experience}
+\section*{Industry Experience}
 
 \entry{\textbf{iRhythm Technologies}, Data Science Intern}
 {Jun -- Aug 2022}
 \begin{itemize}
-     \item Implemented time-series forecasting approaches (ARIMA, CNNs) and decomposition-based methods (empirical mode and seasonal-trend decomposition) to analyze product demand data.
-  \item Compared forecasting approaches across multiple error metrics and applied k-means clustering and principal component analysis (PCA) to investigate patterns in demand data.
+  \item Independently explored time-series forecasting approaches (ARIMA, CNNs, empirical mode and seasonal-trend decomposition) on multi-year daily product-order data, comparing them across error metrics; applied k-means clustering and PCA to look for structure in demand.
 \end{itemize}
 
 \gap
@@ -125,8 +105,27 @@
 {2019 -- 2021}
 \begin{itemize}
   \item Consolidated and cleaned environmental, safety, and security incident data, reconciling records across multiple sources and formats.
-  \item Built Excel visualizations and maintained a dashboard of safety, security, quality, and environmental metrics for laboratory leadership.
+  \item Created and maintained a weekly-updated dashboard of safety, security, quality, and environmental metrics for department leadership, choosing metrics with staff across many roles; presented it at regular department meetings.
   \item Earned Lean Six Sigma Green Belt certification; held a U.S. Department of Energy Q clearance.
+\end{itemize}
+
+\section*{Research Experience}
+
+\entry{\textbf{University of California, Davis}, Graduate Student Researcher}
+{2022 -- Present}
+\begin{itemize}
+  \item Own a project end to end, from experimental design to analysis: built a Python/PyTorch simulation pipeline with SLURM job arrays covering 1,060 parameter combinations for three recurrent network models (up to $N=2{,}000$), generating about 22,000 runs over nearly 90,000 CPU core-hours.
+  \item Adapted and extended a published Lyapunov-spectrum solver (QR/Benettin method, RK4 integration); validated it against a reference implementation and checked numerical convergence via paired comparisons of step size, reorthonormalization interval, duration, and precision.
+  \item Analyzing the resulting dataset to compare how two stabilizing mechanisms shape sensitivity to perturbation (full Lyapunov spectra, attractor dimension, entropy) across network size and gain, against a baseline random network; manuscript in preparation.
+  \item Explored Dynamic Mode Decomposition on high-dimensional neural recordings, working with the neuroscientists who collected the data to understand its context.
+\end{itemize}
+
+\gap
+\entry{\textbf{University of New Mexico}, Ronald E. McNair Scholar and ASSURE Fellow}
+{2021 -- 2022}
+\begin{itemize}
+  \item Applied variance-based Sobol' global sensitivity analysis to attribute variability in Hodgkin--Huxley neuron model outputs to eight uncertain parameters and their interactions, across hundreds of thousands of simulations.
+  \item Presented findings at three national McNair research conferences.
 \end{itemize}
 
 \section*{Teaching}
@@ -140,10 +139,8 @@
 
 \section*{Technical Skills}\raggedright
 
-\textbf{Programming:} Python (NumPy, SciPy, PyTorch, Pandas, Matplotlib), R, MATLAB, Git, LaTeX, HPC/SLURM\par\vspace{2pt}
+\textbf{Programming and Data:} Python (Pandas, NumPy, SciPy, scikit-learn, PyTorch), SQL, R, Git, HPC/SLURM\par\vspace{2pt}
 
-\textbf{Statistics and Modeling:} Time-series forecasting, regression modeling, global sensitivity analysis, clustering, PCA\par\vspace{2pt}
-
-\textbf{Numerical Methods:} Numerical ODE integration, eigenspectral methods, numerical linear algebra, Lyapunov exponents, Dynamic Mode Decomposition, large-scale simulation
+\textbf{Statistics and Machine Learning:} Regression, time-series forecasting (ARIMA, decomposition methods), unsupervised learning (k-means, PCA), global sensitivity analysis, CNNs
 
 \end{document}
